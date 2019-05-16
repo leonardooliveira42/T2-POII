@@ -12,6 +12,29 @@ export class MethodsService {
 
   constructor() {}
 
+  TestarFuncao ( func ){
+    try{
+      const va = this.math.parse('3 * x + 2');
+      console.log(va);
+
+      const inc = va.traverse(function (node, path, parent) {
+          switch (node.type){
+              case 'SymbolNode' :
+                //return node;
+                console.log("Aqui -> ", node.type, node.name);
+                break;
+              default: 
+                console.log('nada');
+                break;
+          }
+      });
+
+      console.log(inc);
+    }catch (e) {
+        console.log(e);
+    }
+  }
+
   // Carregando a função no serviço para os proximos calculos 
   CarregarFuncao( func ){
       this.parser.eval(func);
