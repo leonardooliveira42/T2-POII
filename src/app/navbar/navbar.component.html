@@ -1,0 +1,27 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="#"> T2 - PO II </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Métodos
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" [routerLink]="['/calc', 1]"> Coordenadas Cíclicas </a>
+          <a class="dropdown-item" [routerLink]="['/calc', 2]"> Hooke and Jeeves </a>
+          <a class="dropdown-item" [routerLink]="['/calc', 3]"> Gradiente </a>
+          <a class="dropdown-item" [routerLink]="['/calc', 4]"> Newton </a>
+          <a class="dropdown-item" [routerLink]="['/calc', 5]"> Gradiente Conjugado Generalizado </a>
+          <a class="dropdown-item" [routerLink]="['/calc', 6]"> Fletcher and Reeves </a>
+          <a class="dropdown-item" [routerLink]="['/calc', 7]"> Davidon-Fletcher-Powell </a>
+        </div>
+      </li>
+    </ul>
+  </div>
+</nav>

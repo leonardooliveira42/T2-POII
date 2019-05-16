@@ -1,0 +1,35 @@
+<div class="content">
+    <div class="display-4"> 
+      {{ methodNames[method-1] }} 
+    </div>
+    <p class="mt-3">
+      <button class="btn btn-secondary btn-block" type="button" data-toggle="collapse" 
+      data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"
+      (click)="show()"> {{ collapseState ? "Abrir" : "Fechar" }} </button>
+    </p>
+    <div>
+      <div class="card card-body" [collapse]="collapseState">
+          <app-input-functions (objectEvent)="ReceiveObject($event)" ></app-input-functions>
+      </div>
+    </div>
+
+    <!-- Resultado -->
+    <div class="mt-5">
+        <div class="card">
+          <div *ngIf="obj != null"> 
+            <div class="card-header">
+              Min: {{ obj.fun }}
+              <div *ngIf="true" class="alert alert-danger"> 
+                Função invalida
+              </div>
+            </div>
+            <div class="card-body">
+                <h1> hello world </h1>
+            </div>
+            <div class="card-footer">
+  
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>

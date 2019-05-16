@@ -1,0 +1,23 @@
+.varInput{
+    max-width: 100px;
+}
+
+.funcaos{
+    width: 100%;
+}
+
+.valorX{
+    max-width: 100px;
+}
+
+form{
+    width: 100%;
+}
+
+input{
+    border: red 2px solid;
+}
+
+.calc{
+    margin-top: 20px;
+}

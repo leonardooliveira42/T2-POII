@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 
+declare var require: any
+
 @Injectable({
   providedIn: 'root'
 })
@@ -8,9 +10,7 @@ export class MethodsService {
   math = require('mathjs');
   parser = this.math.parser();
 
-  constructor() { 
-
-  }
+  constructor() {}
 
   // Carregando a função no serviço para os proximos calculos 
   CarregarFuncao( func ){
@@ -29,10 +29,31 @@ export class MethodsService {
       return dh.eval({x: parseFloat(num)});
   }
 
+  CoordenadasCiclicas() {
 
+  }
 
-  
+  HookeAndJeeves() {
 
+  }
 
+  Gradiente() {
 
+  }
+
+  Newton () {
+
+  }
+
+  GradienteConjugadoGeneralizado() {
+
+  }
+
+  FletcherAndReeves() {
+
+  }
+
+  DavidonFletcherPowell(){
+
+  }
 }
