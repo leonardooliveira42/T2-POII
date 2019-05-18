@@ -9,6 +9,8 @@ import { HomeComponent } from './home/home.component';
 import { CalcComponent } from './calc/calc.component';
 import { RouterModule, Routes } from '@angular/router';
 import { CollapseModule } from 'ngx-bootstrap/collapse';
+import { KatexModule } from 'ng-katex';
+
 const appRoutes: Routes = [
     {
         path: '',
@@ -37,7 +39,8 @@ const appRoutes: Routes = [
     BrowserModule, 
     FormsModule, 
     RouterModule.forRoot(appRoutes), 
-    CollapseModule.forRoot()
+    CollapseModule.forRoot(),
+    KatexModule
   ],
   providers: [],
   bootstrap: [AppComponent]

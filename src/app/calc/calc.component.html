@@ -9,27 +9,61 @@
     </p>
     <div>
       <div class="card card-body" [collapse]="collapseState">
-          <app-input-functions (objectEvent)="ReceiveObject($event)" ></app-input-functions>
+          <app-input-functions [method]="method" (objectEvent)="ReceiveObject($event)" ></app-input-functions>
+      </div>
+    </div>
+
+    <!-- Card para mostrar que há uma espera na entrada de dados -->
+    <div class="mt-5" *ngIf="obj == null">
+      <div class="card">
+        <div class="card-body">
+            <div class="display-4">
+                Aguardando...
+            </div>
+        </div>
       </div>
     </div>
 
     <!-- Resultado -->
     <div class="mt-5">
-        <div class="card">
-          <div *ngIf="obj != null"> 
+        <div *ngIf="obj != null" class="card">
             <div class="card-header">
-              Min: {{ obj.fun }}
-              <div *ngIf="false" class="alert alert-danger"> 
-                Função invalida
-              </div>
+                <h4> Método {{ methodNames[method-1] }} </h4>
             </div>
             <div class="card-body">
-                <h1> hello world </h1>
+              <!-- Informações dos dados de entrada -->
+              <div class="row">
+                <div class="col-8">
+                  <!-- Equação -->
+                  <label for=""> Função objetivo</label>
+                </div>
+                <div class="col-2">
+                  <label for=""> X inicial </label>
+                </div>
+                <div class="col-2">
+                  <label for=""> Precisao (&epsilon;) </label>
+                </div>
+              </div>
+
+              <!-- Resultados e iterações -->
+              <div class="resultados">
+
+              </div>
+              <div class="row">
+                <div class="col-8">
+                    <ng-katex [equation]="equation"> </ng-katex>
+                </div>
+                <div class="col-2">
+                  <ng-katex [equation]="initialX"></ng-katex>
+                </div>
+                <div class="col-2">
+                    <span *ngIf=" precision != ''"> &epsilon; = </span>{{ precision }}
+                </div>
+              </div>
             </div>
             <div class="card-footer">
   
             </div>
-          </div>
         </div>
     </div>
   </div>

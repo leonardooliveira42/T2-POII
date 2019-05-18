@@ -6,6 +6,10 @@
     width: 100%;
 }
 
+.inputFunc{
+    float: right;
+}
+
 .valorX{
     max-width: 100px;
 }

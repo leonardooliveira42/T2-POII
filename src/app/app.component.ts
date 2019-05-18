@@ -18,12 +18,4 @@ export class AppComponent implements OnInit {
   ngOnInit() {
       //console.log(this.math.eval('2 + 3'));
   }
-
-  Calcular() {
-      this.math.CarregarFuncao('f(x,y) = x*2 + y^3');
-      console.log(this.math.ResultadoFuncao('f(5,3)'));
-      console.log(this.math.Derivada('f(x,y) = x^2 + y^3', 'x', 3));
-  }
-
-
 }
