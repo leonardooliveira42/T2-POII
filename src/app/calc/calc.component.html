@@ -1,14 +1,14 @@
 <div class="content">
-    <div class="display-4"> 
+    <div class="display-4"> <!-- Nome do método selecionado -->
       {{ methodNames[method-1] }} 
     </div>
-    <p class="mt-3">
+    <p class="mt-3">  <!-- Botão para abrir ou fechar o menu de entrada de dados -->
       <button class="btn btn-secondary btn-block" type="button" data-toggle="collapse" 
       data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample"
       (click)="show()"> {{ collapseState ? "Abrir" : "Fechar" }} </button>
     </p>
     <div>
-      <div class="card card-body" [collapse]="collapseState">
+      <div class="card card-body" [collapse]="collapseState"> <!-- Componente para a entrada dos dados -->
           <app-input-functions [method]="method" (objectEvent)="ReceiveObject($event)" ></app-input-functions>
       </div>
     </div>
@@ -28,7 +28,7 @@
     <div class="mt-5">
         <div *ngIf="obj != null" class="card">
             <div class="card-header">
-                <h4> Método {{ methodNames[method-1] }} </h4>
+                <h4> Método {{ methodNames[method-1] }} </h4> 
             </div>
             <div class="card-body">
               <!-- Informações dos dados de entrada -->
@@ -44,11 +44,6 @@
                   <label for=""> Precisao (&epsilon;) </label>
                 </div>
               </div>
-
-              <!-- Resultados e iterações -->
-              <div class="resultados">
-
-              </div>
               <div class="row">
                 <div class="col-8">
                     <ng-katex [equation]="equation"> </ng-katex>
@@ -60,9 +55,13 @@
                     <span *ngIf=" precision != ''"> &epsilon; = </span>{{ precision }}
                 </div>
               </div>
+              <!-- Resultados e iterações -->
+              <div class="resultados">
+
+              </div>
             </div>
             <div class="card-footer">
-  
+
             </div>
         </div>
     </div>

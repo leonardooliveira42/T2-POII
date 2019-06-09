@@ -15,6 +15,8 @@ export class CalcComponent implements OnInit {
   equation: string;
   initialX: string;
   precision: string = '';
+  nfEquation: string; // Non formated equation
+  nfx0 = [];          // Non formated equation
   collapseState = false;
   obj = null;
 
@@ -36,6 +38,10 @@ export class CalcComponent implements OnInit {
       // Atribui o objeto passado pelo componente filho
       // Esse objeto contem todos os dados de entrada fornecidos anteriormente
       this.obj = $event;
+
+      // Salvando as informações sem estarem formatadas 
+      this.nfEquation = this.obj.fun; 
+      this.nfx0 = this.obj.x0;
       
       // Atualiza as informaçoes no inicio do card body
       this.equation = "\\min\\limits_{ x \\in R }" + this.poMethods.TransformToLatex(this.obj.fun);
@@ -43,15 +49,16 @@ export class CalcComponent implements OnInit {
       this.precision = this.obj.precisao;
       
       // Calcular o ponto minimo usando o método indicado
+      console.log(this.method);
       this.ExecuteMethod();
   }
 
   ExecuteMethod() {
-      // Seleciona o método de acordo com a escolha do usuario
-      switch(this.method){
+      // Seleciona o método de acordo com a escolha do 
+      switch(parseInt(this.method)){
           case 1: 
             // Coordenadas ciclicas 
-            this.poMethods.CoordenadasCiclicas();
+            this.poMethods.CoordenadasCiclicas(this.nfEquation, this.nfx0, this.precision);
             break;
           case 2: 
             // Hooke and Jeeves

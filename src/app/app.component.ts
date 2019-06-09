@@ -7,8 +7,6 @@ import { MethodsService } from './services/methods.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'Oi tania';
-
   nome: string;
 
   constructor(private math: MethodsService)  {
