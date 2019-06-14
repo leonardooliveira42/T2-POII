@@ -1,0 +1,17 @@
+.wrapper{
+    min-height: 100%;
+    position: relative;
+}
+
+.container{
+    min-height: 93vh;
+    padding-bottom: 150px;
+    position: relative;
+}
+
+.rodape{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
