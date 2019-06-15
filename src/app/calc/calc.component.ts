@@ -93,6 +93,7 @@ export class CalcComponent implements OnInit {
             // Gradiente
             var aux3 = this.poMethods.Gradiente(this.nfEquation, this.nfx0, this.precision);
             console.log(aux3);
+            // Formatando os dados para mostrar somente 4 casas decimais
             var newArray3 = aux3.iteracoes.map((item) => {
                 var obj = {
                     k: item.k, 

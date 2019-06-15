@@ -161,11 +161,11 @@ export class MethodsService {
             objIteracao.xk_1 = x1;
             //atualizando k,x e fxk
             k++;
-            // Atualizando o valor de xk 
-            xk = x1;
             // Calculando o valor da função no novo ponto encontrado
             fxk = this.math.eval(this.MinFuncao(newf[1], xk));
             objIteracao.fxk = fxk;
+            // Atualizando o valor de xk 
+            xk = x1;
             // Preparando o gradiente para proxima iteração
             for(let j =0;j<n;j++){
                 var xi = 'x'+j.toString();
