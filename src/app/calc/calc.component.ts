@@ -91,7 +91,27 @@ export class CalcComponent implements OnInit {
             break;
           case 3: 
             // Gradiente
-            this.poMethods.Gradiente(this.nfEquation, this.nfx0, this.precision);
+            var aux3 = this.poMethods.Gradiente(this.nfEquation, this.nfx0, this.precision);
+            console.log(aux3);
+            var newArray3 = aux3.iteracoes.map((item) => {
+                var obj = {
+                    k: item.k, 
+                    xk: item.xk.map((f) => { return parseFloat(f).toFixed(4); }),
+                    fxk: item.fxk.toFixed(4), 
+                    grad: item.grad.map((f) => { return f.toFixed(4); }), 
+                    norm_grad: item.norm_grad.toFixed(4), 
+                    lambda: item.lambda.toFixed(4), 
+                    xk_1: item.xk_1.map((f) => { return parseFloat(f).toFixed(4); }), 
+                    dk: item.dk.map((f) => { return f.toFixed(4); })
+                }; 
+                return obj;
+            });
+            
+            this.resultado[this.method-1] = {
+                iteracoes: newArray3, 
+                resultado: aux3.resultado
+            };
+
             break;
           case 4: 
             // Newton 

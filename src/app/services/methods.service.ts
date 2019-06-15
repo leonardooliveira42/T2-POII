@@ -17,7 +17,7 @@ export class MethodsService {
   /** METODOS DE PROGRAMAÇÃO NÃO LINEAR: MULTIVARIAVEL IRRESTRITO
    *      A seguir estão os métodos sem o uso de derivadas
    */
-  CoordenadasCiclicas(func: string, x0: Array<number>, pre: string) {
+    CoordenadasCiclicas(func: string, x0: Array<number>, pre: string) {
 
       var initialX = x0.map((item) => {
           return item.toString(); 
@@ -112,91 +112,79 @@ export class MethodsService {
         var initialX = x0.map((item) => {
             return item.toString(); 
         }); 
-        console.log(`funcao: ${func}`);
-        console.log(`x: ${x0}`);
-        console.log(`precisao: ${pre}`);
-        var resultado = this.CalculoGradiente(func, initialX, pre,x0.length); 
-  
-        console.log(`Resultado do gradiente: ${resultado}`); 
-  
+        var resultado = this.CalculoGradiente(func, initialX, pre,x0.length);   
         return resultado; 
-
     }
 
     CalculoGradiente(f,x,precisao,n){
         var iteracoes = []; 
-        var objIteracao = { 
-            k: null, //ok
-            xk: null,  //ok
-            fxk: null,  //ok
-            grad: [n], //ok
-            norm_grad: null,//ok
-            dk: [n],
-            lambda: null,
-            xk_1: null,
-        };
-        //console.log(`x: ${x}`)
-        var newf = f.split('='); newf[0] = 'f(x) = '; 
-        //console.log(`func: ${newf[1]}`)
-                // Atualizando o valor da função de x atual e jogando no objeto do resultado 
         
-        objIteracao.k = 1;
-        console.log(`===================================`)
-        console.log(`iteracao ${objIteracao.k}`)
-        //console.log(`k :${objIteracao.k}`);
-        objIteracao.xk = x;
-        console.log(`xk :${objIteracao.xk}`);
-        objIteracao.fxk = this.math.eval(this.MinFuncao(newf[1], objIteracao.xk));
-        console.log(`fxk :${objIteracao.fxk}`);
+        var newf = f.split('='); newf[0] = 'f(x) = '; 
+        var k = 0;  
+        var xk = x; 
+        var fxk = this.math.eval(this.MinFuncao(newf[1], xk));
+        var grad = []; 
         //fazendo gradiente
         for(let j =0;j<n;j++){
             var xi = 'x'+j.toString();
-            objIteracao.grad[j] = this.math.derivative(newf[1],'x'+j);            
-            //console.log(`grad1 :${objIteracao.grad[j]}`);
-            objIteracao.grad[j] = this.math.eval(this.MinFuncao(objIteracao.grad[j].toString(),objIteracao.xk));
+            grad[j] = this.math.derivative(newf[1],'x'+j);                      
+            grad[j] = this.math.eval(this.MinFuncao(grad[j].toString(),xk));    
             
         }
-        console.log(`gradiente : ${objIteracao.grad}`)
          //fazendo norma
-         objIteracao.norm_grad = this.NormaVetor(objIteracao.grad); 
-         console.log(`norma gradiente :${objIteracao.norm_grad}`);
+         var norm_grad = this.NormaVetor(grad);             
+         var dk = [];
         //loop
-        while(!this.NormaVetorMenorPrecisao(objIteracao.grad,precisao)){
-           
+        while(!this.NormaVetorMenorPrecisao(grad,precisao) && k < 300){
+            var objIteracao = { 
+                k: k, //ok
+                xk: xk,  //ok
+                fxk: null,  //ok
+                grad: grad, //ok
+                dk: null, //ok
+                lambda: null, //ok
+                xk_1: null, //ok
+                norm_grad: norm_grad
+            };
             //fazendo direcao = -grad 
             for(let j =0;j<n;j++){
-                objIteracao.dk[j] = objIteracao.grad[j]*-1;
-                //console.log(`direcao d${j}: ${objIteracao.dk[j]}`);
+                dk[j] = grad[j]*-1;
             }
-            console.log(`direcao d${objIteracao.k}: ${objIteracao.dk}`);
+            objIteracao.dk = dk;
             //fazendo lambda
-            var aux = this.SomaVetor(objIteracao.xk, this.EscalarVetor('x', objIteracao.dk));
+            var aux = this.SomaVetor(xk, this.EscalarVetor('x', dk));
             var lambda = newf[0] + this.MinFuncao(newf[1], aux);
             var resultadoLambda = this.MonoNewton(0, lambda, 0.001);
-            console.log(`lambda : ${resultadoLambda}`);
+            objIteracao.lambda = resultadoLambda;
             //novo x
-            var x1 = this.SomaVetor(objIteracao.xk, this.EscalarVetor(`${resultadoLambda}`,objIteracao.dk)); 
-            console.log(`novo x: ${x1}`)  
+            var x1 = this.SomaVetor(xk, this.EscalarVetor(`${resultadoLambda}`, dk)); 
+            objIteracao.xk_1 = x1;
             //atualizando k,x e fxk
-            objIteracao.k++;
-            console.log(`===================================`)
-            console.log(`iteracao ${objIteracao.k}`)
-            objIteracao.xk = x1;
-            console.log(`xk :${objIteracao.xk}`);
-            objIteracao.fxk = this.math.eval(this.MinFuncao(newf[1], objIteracao.xk));
-            console.log(`fxk :${objIteracao.fxk}`);
+            k++;
+            // Atualizando o valor de xk 
+            xk = x1;
+            // Calculando o valor da função no novo ponto encontrado
+            fxk = this.math.eval(this.MinFuncao(newf[1], xk));
+            objIteracao.fxk = fxk;
+            // Preparando o gradiente para proxima iteração
             for(let j =0;j<n;j++){
                 var xi = 'x'+j.toString();
-                objIteracao.grad[j] = this.math.derivative(newf[1],'x'+j);            
-                //console.log(`grad1 :${objIteracao.grad[j]}`);
-                objIteracao.grad[j] = this.math.eval(this.MinFuncao(objIteracao.grad[j].toString(),objIteracao.xk));                
+                grad[j] = this.math.derivative(newf[1],'x'+j);            
+                grad[j] = this.math.eval(this.MinFuncao(grad[j].toString(),xk));                
             }
-            console.log(`gradiente : ${objIteracao.grad}`)            
             //fazendo norma
-            objIteracao.norm_grad = this.NormaVetor(objIteracao.grad); 
-            console.log(`norma gradiente :${objIteracao.norm_grad}`);
+            norm_grad = this.NormaVetor(grad);             
+
+            iteracoes.push(this.CopyAnything(objIteracao));
         }
-        return objIteracao.xk;        
+        if(k == 300){
+            alert("Numero máximo de 300 iterações ultrapassados");
+        }
+        var objResultado = {
+            iteracoes: iteracoes, 
+            resultado: xk
+        };
+        return objResultado;        
     }
 
     Newton () {
@@ -230,8 +218,8 @@ export class MethodsService {
         });
         var resultado =  this.math.eval(`sqrt(${soma})`);         
         var criterioParada = (resultado < parseFloat(pre));
-        console.log(`${resultado} < ${pre}? ${criterioParada}`);  
-        console.log(`Criterio de parada atingido: ${criterioParada}`); 
+        //console.log(`${resultado} < ${pre}? ${criterioParada}`);  
+        //console.log(`Criterio de parada atingido: ${criterioParada}`); 
         return criterioParada;
     }
     NormaVetor( vetor: Array<string>) {
