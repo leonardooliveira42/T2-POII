@@ -11,6 +11,7 @@ export class CalcComponent implements OnInit {
 
   methodNames = ["Coordenadas Cíclicas", "Hooke and Jeeves", "Gradiente", "Newton", 
   "Gradiente Conjugado Generalizado", "Fletcher and Reeves", "Davidon-Fletcher-Powell"];
+  quantidadeDeVariaveis: number;
   method: any;
   equation: string;
   initialX: string;
@@ -19,6 +20,7 @@ export class CalcComponent implements OnInit {
   nfx0 = [];          // Non formated equation
   collapseState = false;
   obj = null;
+  resultado = [null, null, null, null, null, null, null]; 
 
   constructor(private route: ActivatedRoute, 
               private poMethods: MethodsService) { }
@@ -42,14 +44,13 @@ export class CalcComponent implements OnInit {
       // Salvando as informações sem estarem formatadas 
       this.nfEquation = this.obj.fun; 
       this.nfx0 = this.obj.x0;
-      
       // Atualiza as informaçoes no inicio do card body
       this.equation = "\\min\\limits_{ x \\in R }" + this.poMethods.TransformToLatex(this.obj.fun);
       this.initialX = this.poMethods.TransformToLatex("x0 = " + JSON.stringify(this.obj.x0));
       this.precision = this.obj.precisao;
       
       // Calcular o ponto minimo usando o método indicado
-      console.log(this.method);
+      console.log(this.obj.qV);
       this.ExecuteMethod();
   }
 
@@ -58,7 +59,32 @@ export class CalcComponent implements OnInit {
       switch(parseInt(this.method)){
           case 1: 
             // Coordenadas ciclicas 
-            this.poMethods.CoordenadasCiclicas(this.nfEquation, this.nfx0, this.precision);
+            //this.resultado[this.method-1] 
+            var aux = this.poMethods.CoordenadasCiclicas(this.nfEquation, this.nfx0, this.precision);
+            var newArray = aux.iteracoes.map((item) => {
+               var newobj = {
+                  k: item.k, 
+                  xk: item.xk.map((variavel) => { return parseFloat(parseFloat(variavel).toFixed(4)); }),
+                  fxk: parseFloat(parseFloat(item.fxk).toFixed(4)), 
+                  intern: item.intern.map((fo) => { 
+                      var newforObj = {
+                         j: fo.j, 
+                         d: fo.d, 
+                         yk: fo.yk.map((f)=> { return parseFloat(parseFloat(f).toFixed(4)); }),
+                         lbda: parseFloat(parseFloat(fo.lbda).toFixed(4)), 
+                         yk1: fo.yk1.map((f) => { return parseFloat(parseFloat(f).toFixed(4)); })
+                      };
+                      return newforObj;
+                  })   
+               }; 
+               return newobj;
+            });
+            console.log(newArray);
+            this.resultado[this.method-1] = {
+                iteracoes: newArray, 
+                resultado: aux.resultado //this.poMethods.TransformToLatex("x* = " + JSON.stringify(aux.resultado))
+            };
+            console.log(this.resultado[this.method-1]);
             break;
           case 2: 
             // Hooke and Jeeves

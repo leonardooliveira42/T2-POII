@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ConstantPool } from '@angular/compiler';
 
 declare var require: any
 
@@ -12,6 +11,8 @@ export class MethodsService {
   parser = this.math.parser();
 
   constructor() {}
+
+  // TODO Verificar divisão por 0 e procurar por muitos erros
   
   /** METODOS DE PROGRAMAÇÃO NÃO LINEAR: MULTIVARIAVEL IRRESTRITO
    *      A seguir estão os métodos sem o uso de derivadas
@@ -22,64 +23,82 @@ export class MethodsService {
           return item.toString(); 
       }); 
 
-      var resultado = this.CalculoCoordenadasCiclicas(0, func, initialX, x0.length, pre, this.GerarIdentidade(x0.length)); 
+      var resultado = this.CalculoCoordenadasCiclicas(0, func, initialX, x0.length, pre, this.GerarIdentidade(x0.length), 300); 
 
       console.log(`Resultado das coordenadas ciclicas: ${resultado}`); 
 
       return resultado; 
     }
 
-    CalculoCoordenadasCiclicas(k, f, x0, n,pre, d){     // Função teste: (x0 - 2)^4 + (x0 - 2x1)^2
+    CalculoCoordenadasCiclicas(k, f, x0, n,pre, d, kmax){     // Função teste: (x0 - 2)^4 + (x0 - 2x1)^2
 
         var iteracoes = []; 
-        var objIteracao = { 
-            k: null,
-            xk: null, 
-            fxk: null, 
-            intern: null             
-        };
         
+        // Quebrando a função em dois e atualizando o f(x0, x1, ... xn) para f(x) 
+        var newf = f.split('='); newf[0] = 'f(x) = '; 
         do{ 
+            var objIteracao = { 
+                k: null,
+                xk: null, 
+                fxk: null, 
+                intern: null             
+            };
             // Atualizando os valores do objeto iteração 
             objIteracao.k = k; 
             objIteracao.xk = x0; 
-
             var forIteracoes = [];
-            var objIntFor = {
-                j: null, 
-                d: null, 
-                yk: null, 
-                lbda: null, 
-                yk1: null
-            }; 
-            console.log(` >>> Iteração ${k} <<<`);
+            
+            //console.log(` >>> Iteração ${k} <<<`);
             var loop = true; 
             var y1 = x0; 
             var aux;
+            // Atualizando o valor da função de x atual e jogando no objeto do resultado 
+            objIteracao.fxk = this.math.eval(this.MinFuncao(newf[1], x0));
             for(let j=0; j<n; j++){
+                var objIntFor = {
+                    j: null, 
+                    d: null, 
+                    yk: null, 
+                    lbda: null, 
+                    yk1: null
+                }; 
+                objIntFor.j = j; 
+                objIntFor.d = d[j]; 
+                objIntFor.yk = y1; 
                 aux = this.SomaVetor(y1, this.EscalarVetor('x', d[j])); 
-                // Quebrando a função em dois e atualizando o f(x0, x1, ... xn) para f(x) 
-                var newf = f.split('='); newf[0] = 'f(x) = '; 
-                // Atualizando o valor da função de x atual e jogando no objeto do resultado 
-                objIteracao.fxk = this.math.eval(this.MinFuncao(newf[1], x0));
-                 
                 // Substitui os valores dos respectivos x0, x1, x2.. e como o lambda como x
                 var lambda = newf[0] + this.MinFuncao(newf[1], aux);
                 // Executa a minimização por newton monovariavel com o valor inicial = 0 e a precisao de 0.001
                 var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
+                objIntFor.lbda = resultadoLambda; 
                 // Atualiza o y1 com o valor do lambda encontrado pelo método de newton 
-                y1 = this.SomaVetor(y1, this.EscalarVetor(`${resultadoLambda}`, d[j])); 
+                try{
+                    y1 = this.SomaVetor(y1, this.EscalarVetor(`${resultadoLambda}`, d[j])); 
+                }catch (e) {
+                    alert(e);
+                }
+                objIntFor.yk1 = y1; 
+                forIteracoes.push(this.CopyAnything(objIntFor));
             }
-            console.log(y1); 
+            objIteracao.intern = forIteracoes;
+            iteracoes.push(this.CopyAnything(objIteracao));
+            console.log(iteracoes); 
             // Verificando o criterio de parada
             var sub = this.SubtraiVetor(y1, x0); 
-            console.log("subtração dos vetores" + sub); 
+            //console.log("subtração dos vetores" + sub); 
             if(!this.NormaVetorMenorPrecisao(sub, pre)) loop = true; // Se o critério de parada não foi atingido, continua o loop
             else loop = false;                                       // Se o criterio de parada foi atingido, então encerra o loop
             x0 = y1;        // Atualiza o valor de x0
             k++; 
-        }while(loop);
-        return x0;          // Retorna o resultado 
+        }while(loop && k < kmax);
+        var objResultado = {
+            iteracoes: iteracoes, 
+            resultado: x0
+        }
+        if(k == kmax){
+            alert("Número de iterações máximo ultrapassado");  
+         }
+        return objResultado;          // Retorna o resultado 
     }
 
     HookeAndJeeves() {
@@ -306,6 +325,12 @@ export class MethodsService {
             }
         }
         return matriz; 
+    }
+
+    // Função para copiar qualquer coisa
+    CopyAnything(ob: any){
+        var outro = ob; 
+        return outro; 
     }
 
     /*************************************************************************** 
