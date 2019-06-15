@@ -91,6 +91,7 @@ export class CalcComponent implements OnInit {
             break;
           case 3: 
             // Gradiente
+            this.poMethods.Gradiente(this.nfEquation, this.nfx0, this.precision);
             break;
           case 4: 
             // Newton 
