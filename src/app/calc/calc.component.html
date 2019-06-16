@@ -76,9 +76,9 @@
                           <td style="vertical-align: middle;" [attr.rowspan]="obj.qV"> {{ item.fxk }} </td>
                           <td> {{ item.intern[0].j }} </td>
                           <td> ({{ item.intern[0].d }}) </td>
-                          <td> {{ item.intern[0].yk }} </td>
+                          <td> ({{ item.intern[0].yk }}) </td>
                           <td> {{ item.intern[0].lbda }} </td>
-                          <td> {{ item.intern[0].yk1 }} </td>
+                          <td> ({{ item.intern[0].yk1 }}) </td>
                         </tr>
                         <ng-container *ngFor="let i of item.intern">
                           <tr *ngIf=" i.j != 0">
@@ -203,47 +203,41 @@
                </table>
               </div>
 
-           <div class="resultados" *ngIf="resultado[method-1] != null  && method == 4"> <!-- Método do gradiente -->
-            <table class="table table-bordered text-center mt-5">
-              <thead class="thead-dark">
-                 <th> Iteração </th>
-                 <th> x<sub>k</sub> </th>
-                 <th> f(x<sub>k</sub>) </th>
-                 <th> grad f(x<sub>k</sub>) </th>
-                 <th> || grad f(x<sub>k</sub>) ||</th>
-                 <th> H(x<sub>k</sub>) </th>
-                 <th> H(x<sub>k</sub>)<sup>-1</sup> </th>
-                 <th> d<sub>k</sub> = - grad f(x<sub>k</sub>)</th>
-                 <th> x<sub>k+1</sub></th>
-              </thead>
-              <tbody>
-                <ng-container *ngFor="let item of resultado[method-1].iteracoes">
-                  <tr>
-                    <td> {{ item.k }} </td>
-                    <td> ( {{ item.xk }} ) </td>
-                    <td> {{ item.fxk }} </td>
-                    <td> ( {{ item.grad }} ) </td>
-                    <td> {{ item.norm_grad }} </td>
-                    <td> ( {{ item.hessiana }} ) </td>
-                    <td> {{ item.hessiana_inversa }} </td>
-                    <td> ( {{ item.dk }} ) </td>
-                    <td> ( {{ item.xk_1 }} ) </td>
-                  </tr>
-                </ng-container>
-              </tbody>
-              <tfoot class="thead-dark">
-                <th> Iteração </th>
-                 <th> x<sub>k</sub> </th>
-                 <th> f(x<sub>k</sub>) </th>
-                 <th> grad f(x<sub>k</sub>) </th>
-                 <th> || grad f(x<sub>k</sub>) ||</th>
-                 <th> H(x<sub>k</sub>) </th>
-                 <th> H(x<sub>k</sub>)<sup>-1</sup> </th>
-                 <th> d<sub>k</sub> = -H(x<sub>k</sub>)<sup>-1</sup>*grad f(x<sub>k</sub>)</th>
-                 <th> x<sub>k+1</sub></th>
-              </tfoot>
-           </table>
-       </div>
+              <div class="resultados" *ngIf="resultado[method-1] != null  && method == 4"> <!-- Método do gradiente -->
+                <table class="table table-bordered text-center mt-5">
+                  <thead class="thead-dark">
+                    <th> k </th>
+                    <th> x<sub>k</sub> <br> f(x<sub>k</sub>) </th>
+                    <th> grad f(x<sub>k</sub>) <br> || grad f(x<sub>k</sub>) || </th>
+                    <th> H(x<sub>k</sub>) </th>
+                    <th> H(x<sub>k</sub>)<sup>-1</sup> </th>
+                    <th> d<sub>k</sub> = - grad f(x<sub>k</sub>)</th>
+                    <th> x<sub>k+1</sub></th>
+                  </thead>
+                  <tbody>
+                    <ng-container *ngFor="let item of resultado[method-1].iteracoes">
+                      <tr>
+                        <td> {{ item.k }} </td>
+                        <td> ( {{ item.xk }} ) <br> {{ item.fxk }} </td>
+                        <td> ( {{ item.grad }} ) <br> {{ item.norm_grad }} </td>
+                        <td> <ng-container *ngFor="let linha of item.hessiana"> {{ linha }} <br> </ng-container> </td><!-- <ng-container  *ngFor="let linha of item.hessiana"> {{ linha }} <br> </ng-container>  </td>-->
+                        <td> <ng-container *ngFor="let linha of item.hessiana_inversa"> {{ linha }} <br> </ng-container> </td>
+                        <td> ( {{ item.dk }} ) </td>
+                        <td> ( {{ item.xk_1 }} ) </td>
+                      </tr>
+                    </ng-container>
+                  </tbody>
+                  <tfoot class="thead-dark">
+                      <th> k </th>
+                      <th> x<sub>k</sub> <br> f(x<sub>k</sub>) </th>
+                      <th> grad f(x<sub>k</sub>) <br> || grad f(x<sub>k</sub>) || </th>
+                      <th> H(x<sub>k</sub>) </th>
+                      <th> H(x<sub>k</sub>)<sup>-1</sup> </th>
+                      <th> d<sub>k</sub> = - grad f(x<sub>k</sub>)</th>
+                      <th> x<sub>k+1</sub></th>
+                  </tfoot>
+              </table>
+              </div>
 
             </div>
             <div class="card-footer bg-success text-white">

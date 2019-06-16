@@ -149,18 +149,19 @@ export class CalcComponent implements OnInit {
             // Newton
             var aux4 = this.poMethods.Newton(this.nfEquation, this.nfx0, this.precision);
             console.log(aux4);
-            // Formatando os dados para mostrar somente 4 casas decimais
+            // Formatando os dados para mostrar somente x casas decimais
             var newArray4 = aux4.iteracoes.map((item) => {
+                var casasDecimais = 2;
                 var obj = {
                     k: item.k, 
-                    xk: item.xk.map((f) => { return parseFloat(f).toFixed(4); }),
-                    fxk: item.fxk.toFixed(4), 
-                    grad: item.grad.map((f) => { return f.toFixed(4); }), 
-                    norm_grad: item.norm_grad.toFixed(4), 
-                    hessiana: item.hessiana.map((f) => { return parseFloat(f).toFixed(4); }), 
-                    hessiana_inversa: item.hessiana_inversa.map((f)=> { return parseFloat(f).toFixed(4);}),
-                    dk: item.dk.map((f) => { return f.toFixed(4); }),
-                    xk_1: item.xk_1.map((f) => { return parseFloat(f).toFixed(4); })                   
+                    xk: item.xk.map((f) => { return parseFloat(f).toFixed(casasDecimais); }),
+                    fxk: item.fxk.toFixed(casasDecimais), 
+                    grad: item.grad.map((f) => { return f.toFixed(casasDecimais); }), 
+                    norm_grad: item.norm_grad.toFixed(casasDecimais), 
+                    hessiana: item.hessiana.map((f) => { return f.map((f2) => { return f2.toFixed(casasDecimais); }); }), 
+                    hessiana_inversa: item.hessiana_inversa.map((f)=> { return f.map((f2) => { return f2.toFixed(casasDecimais); }); }),
+                    dk: item.dk.map((f) => { return f.toFixed(casasDecimais); }),
+                    xk_1: item.xk_1.map((f) => { return parseFloat(f).toFixed(casasDecimais); })                   
                 }; 
                 return obj;
             });
@@ -169,6 +170,7 @@ export class CalcComponent implements OnInit {
                 iteracoes: newArray4, 
                 resultado: aux4.resultado
             };
+            console.log(this.resultado[this.method-1]);
 
             break;
           case 5: 
