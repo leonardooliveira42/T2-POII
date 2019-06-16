@@ -16,7 +16,8 @@ export class InputFunctionsComponent implements OnInit {
   variables: string;
   startX = [];
   pre: number;
-
+  q= [];
+  b = [];
   // Erros de entrada dos dados 
   errFunc: boolean = false;
   errVari: boolean = false;
@@ -79,7 +80,7 @@ export class InputFunctionsComponent implements OnInit {
       this.errFunc = true;
     } else this.errFunc = false;
 
-    if(!this.CompareVariables(this.quantVar, aux2)){
+    if(!this.CompareVariables(this.quantVar, aux2) && this.method != 5){
           this.errVari = true;
     } else this.errVari = false;
 
@@ -95,12 +96,24 @@ export class InputFunctionsComponent implements OnInit {
         }
       }
 
-      const send = {
-        qV: this.quantVar, 
-        fun: this.variables + this.function, 
-        x0: this.startX, 
-        precisao: this.pre
-      };
+      var send = {};
+      if(this.method == 5){
+        send = {
+          qV: this.quantVar, 
+          fun: this.variables + this.function, 
+          x0: this.startX, 
+          precisao: this.pre,
+          q : this.q,
+          b : this.b
+        };
+      }else{
+        send = {
+                qV: this.quantVar, 
+                fun: this.variables + this.function, 
+                x0: this.startX, 
+                precisao: this.pre
+              };
+      }
       this.objectEvent.emit(send);
     }
 
