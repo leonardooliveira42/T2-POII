@@ -356,10 +356,104 @@ export class MethodsService {
         return objResultado;  
     }
     /** Métodos que usam Direções conjudadas  */
-    GradienteConjugadoGeneralizado() {
+    GradienteConjugadoGeneralizado(func: string, x0: Array<number>, pre: string, q: Array<number>, b: Array<number> ) {
+
+        var initialX = x0.map((item) => {
+            return item.toString(); 
+        }); 
+        var Q = q.map((item) => {
+            return item.toString(); 
+        }); 
+        var B = b.map((item) => {
+            return item.toString(); 
+        }); 
+        var resultado = this.CalculoGradiente_conj(func, initialX, pre,x0.length,Q,B);   
+        return resultado; 
 
     }
-
+    CalculoGradiente_conj(f,x,precisao,n,q,b){ 
+        var iteracoes = [];         
+        var newf = f.split('='); newf[0] = 'f(x) = '; 
+        console.log(newf[1]);
+        q = this.listToMatrix(q,n);
+        q = this.math.transpose(q);  //q é uma matriz
+        //console.log(q); ok
+        //console.log(b); ok
+        var k = 0;  
+        var xk = x;
+        var g0;
+        g0 = this.math.subtract(this.math.multiply(q,xk),b);
+        var d0 = this.math.multiply(-1,g0);
+        //console.log(g0)
+        //console.log(d0)
+        if(this.NormaVetor(g0)<precisao){
+            var objIteracao1 = { 
+                k: 0, //ok
+                xk:xk,  //ok
+                gk: g0, //ok   
+                dk: d0, //ok
+            };
+            iteracoes.push(this.CopyAnything(objIteracao1));
+            var objResultado1 = {
+                iteracoes: iteracoes, 
+                resultado: xk //.map((item) => { return this.math.simplify(item); })
+            };
+            return objResultado1;
+        }
+        while(k < 300){
+            var objIteracao = { 
+                k: k, //ok
+                xk:[],  //ok
+                gk: [], //ok
+                gk_1: [],         
+                dk: [], //ok
+                lambdak:[],
+                dk_1:[],
+                bk:[],
+                xk_1: [], //ok 
+            };
+            objIteracao.xk = xk;
+            objIteracao.dk = d0;
+            objIteracao.gk = g0;
+            objIteracao.lambdak = this.math.multiply(-1,
+                (this.math.divide(
+                this.math.multiply(this.math.transpose(objIteracao.gk),objIteracao.dk),
+                this.math.multiply(this.math.multiply(this.math.transpose(objIteracao.dk),q),objIteracao.dk)
+                    )));
+            objIteracao.xk_1 = this.math.add(objIteracao.xk ,this.math.multiply(objIteracao.lambdak,objIteracao.dk));
+            //console.log(objIteracao.lambdak);
+            //console.log(objIteracao.xk_1);
+            objIteracao.gk_1 =  this.math.subtract(this.math.multiply(q,objIteracao.xk_1),b);
+            
+            if(this.NormaVetor(objIteracao.gk_1)<precisao){
+                xk = objIteracao.xk_1;
+                //console.log("norma(g"+(k+1)+") = "+this.NormaVetor(objIteracao.gk_1)+" < precisao");
+                iteracoes.push(this.CopyAnything(objIteracao)); 
+                break;
+            }
+            objIteracao.bk = this.math.divide(
+                this.math.multiply(this.math.multiply(this.math.transpose(objIteracao.gk_1),q),objIteracao.dk),
+                this.math.multiply(this.math.multiply(this.math.transpose(objIteracao.dk),q),objIteracao.dk)
+                    );
+            objIteracao.dk_1 = this.math.add(
+                this.math.multiply(-1,objIteracao.gk_1),
+                this.math.multiply(objIteracao.bk,objIteracao.dk)
+            );
+            //console.log(objIteracao.gk_1);
+            //console.log(objIteracao.bk);
+            //console.log(objIteracao.dk_1);
+            xk = objIteracao.xk_1;
+            d0 = objIteracao.dk_1;
+            g0 = objIteracao.gk_1;
+            iteracoes.push(this.CopyAnything(objIteracao));            
+        }
+        var objResultado = {
+            iteracoes: iteracoes, 
+            resultado: xk //.map((item) => { return this.math.simplify(item); })
+        };
+        //return objResultado; 
+    return objResultado;
+    }
     /** Extensão para problemas não quadraticos  */
     FletcherAndReeves(f, x, precisao, n) {
         var initialX = x.map((item) => { return item.toString(); }); 
@@ -382,7 +476,7 @@ export class MethodsService {
         var g = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item.toString(), x0));}); 
         var d = this.EscalarVetor('-1', g); 
         console.log(`Gradiente: ${gradiente}, G: ${g}, Direção: ${d}`);
-        while(!this.NormaVetorMenorPrecisao(gradiente, pre) && k < 30){ //Passo  1
+        while(!this.NormaVetorMenorPrecisao(gradiente, pre) && k < 30 && false){ //Passo  1
             console.log(`>>> Iteração: ${k} <<< `);
             // Cria o objeto iteração 
             
@@ -396,19 +490,14 @@ export class MethodsService {
                 // Novo x
                 var xk1 = this.SomaVetor(x0, this.EscalarVetor(`${resultadoLambda}`, d));
                 // Calculando o novo gradiente 
-                var newG = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item.toString(), xk1));});
-                console.log(`novo gradiente: ${newG}`);
+                var newGrad = gradiente.map((item) => {return this.MinFuncao(item, xk1);});
                 // Calculando o novo g
 
                 // Verificando j
                 if( j == (n-1) ){
-                    x0 = xk1;
-                } else {
-                    // Calcular o beta 
-                    var beta = this.Betak(g, newG);
 
-                    var novaD = this.SomaVetor(this.EscalarVetor('-1', newG), this.EscalarVetor(`${beta}`, d)); 
-                    d = novaD; 
+                } else {
+
                 }
             } // Fim do for 
             k++;            
@@ -484,6 +573,20 @@ export class MethodsService {
         } catch(e) {
             return ['false'];
         }     
+    }
+    listToMatrix(list, elementsPerSubArray) {
+        var matrix = [], i, k;
+    
+        for (i = 0, k = -1; i < list.length; i++) {
+            if (i % elementsPerSubArray === 0) {
+                k++;
+                matrix[k] = [];
+            }
+    
+            matrix[k].push(list[i]);
+        }
+    
+        return matrix;
     }
 
     // Transforma uma string expressão em texto latex
