@@ -38,6 +38,26 @@
                     </div>
                 </div>
             </div>
+            <div class="col" *ngIf="method == 5 ">
+              <h6 > Q: </h6>
+              <div class="form-row">
+                  <div class="ml-2" *ngFor="let item of createRange(quantVar)">
+                      <div class="ml-2" *ngFor="let item2 of createRange(quantVar)">
+                        <input type="number" placeholder="[{{item}},{{item2}}]" value="0" class="form-control valorX" 
+                        [(ngModel)]="q[item*quantVar + item2]" [ngModelOptions]="{standalone: true}">
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="col"*ngIf="method == 5 ">
+            <h6 > b </h6>
+            <div class="form-row">
+                <div class="ml-2" *ngFor="let item of createRange(quantVar)">
+                    <input type="number" placeholder="{{item}}" value="0" class="form-control valorX" 
+                    [(ngModel)]="b[item]" [ngModelOptions]="{standalone: true}">
+                </div>
+            </div>
+        </div>
           </div>
           <div class="row mt-3">
             <div class="col-4">

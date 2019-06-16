@@ -19,6 +19,8 @@ export class CalcComponent implements OnInit {
   nfEquation: string; // Non formated equation
   nfx0 = [];          // Non formated equation
   collapseState = false;
+  q = [];
+  b = [];
   obj = null;
   resultado = [null, null, null, null, null, null, null]; 
 
@@ -48,7 +50,10 @@ export class CalcComponent implements OnInit {
       this.equation = "\\min\\limits_{ x \\in R }" + this.poMethods.TransformToLatex(this.obj.fun);
       this.initialX = this.poMethods.TransformToLatex("x0 = " + JSON.stringify(this.obj.x0));
       this.precision = this.obj.precisao;
-      
+      if(this.method == 5){
+        this.q = this.obj.q;
+        this.b = this.obj.b;
+      }
       // Calcular o ponto minimo usando o método indicado
       console.log(this.obj.qV);
       this.ExecuteMethod();
@@ -174,7 +179,32 @@ export class CalcComponent implements OnInit {
 
             break;
           case 5: 
-            // Gradiente Conjugado Generalizado
+            // Gradiente Conjugado Generalizado 
+            var aux5 = this.poMethods.GradienteConjugadoGeneralizado(this.nfEquation, this.nfx0, this.precision,this.q,this.b);
+            //console.log(aux5);
+            var newArray5 = aux5.iteracoes.map((item) => {
+              var casasDecimais = 2;
+              var obj = {
+                  k: item.k, 
+                  xk: item.xk.map((f) => { return parseFloat(f).toFixed(casasDecimais); }),
+                  gk: item.gk.map((f) => { return f.toFixed(casasDecimais); }), 
+                  dk: item.dk.map((f) => { return f.toFixed(casasDecimais); }),
+
+                  lambdak: item.lambdak.toFixed(casasDecimais),
+                  xk_1: item.xk_1.map((f) => { return parseFloat(f).toFixed(casasDecimais); }),
+                  gk_1: item.gk_1.map((f) => { return f.toFixed(casasDecimais); }), 
+                  bk: item.bk, 
+                  dk_1: item.dk_1.map((f) => { return f.toFixed(casasDecimais); }),
+
+                  }; 
+              return obj;
+          });
+          
+          this.resultado[this.method-1] = {
+              iteracoes: newArray5, 
+              resultado: aux5.resultado
+          };
+          console.log(this.resultado[this.method-1]);
             break;
           case 6: 
             //Fletcher and Reeves
@@ -194,5 +224,7 @@ export class CalcComponent implements OnInit {
      this.nfEquation = ''; 
      this.nfx0 = null;
      this.quantidadeDeVariaveis = 0;
+     this.q = null;
+     this.b = null;
   }
 }
