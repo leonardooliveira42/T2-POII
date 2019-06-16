@@ -356,6 +356,7 @@ export class MethodsService {
         return objResultado;  
     }
     /** Métodos que usam Direções conjudadas  */
+    // Feito 
     GradienteConjugadoGeneralizado(func: string, x0: Array<number>, pre: string, q: Array<number>, b: Array<number> ) {
 
         var initialX = x0.map((item) => {
@@ -470,34 +471,28 @@ export class MethodsService {
         var k = 0;
         var newf = f.split('='); newf[0] = 'f(x) = ';  
         for(let i=0; i<n; i++){
-            console.log('teste');
-            gradiente[i] = this.math.derivative(newf[1], 'x'+i); 
+            //console.log('teste');
+            gradiente[i] = this.math.derivative(newf[1], 'x'+i).toString(); 
         }
-        var g = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item.toString(), x0));}); 
+        var g = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item, x0));}); 
         var d = this.EscalarVetor('-1', g); 
         console.log(`Gradiente: ${gradiente}, G: ${g}, Direção: ${d}`);
-        while(!this.NormaVetorMenorPrecisao(gradiente, pre) && k < 30 && false){ //Passo  1
-            console.log(`>>> Iteração: ${k} <<< `);
-            // Cria o objeto iteração 
-            
-            // Passo 2
+        while(!this.NormaVetorMenorPrecisao(g, pre) && k < 30){ //Passo  1
+            console.log(`>>> Iteração: ${k} <<<`);
             for(let j=0; j<n; j++){
                 var aux = this.SomaVetor(x0, this.EscalarVetor('x', d)); 
-                // Substitui os valores dos respectivos x0, x1, x2.. e como o lambda como x
                 var lambda = newf[0] + this.MinFuncao(newf[1], aux);
-                // Executa a minimização por newton monovariavel com o valor inicial = 0 e a precisao de 0.001
                 var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
-                // Novo x
                 var xk1 = this.SomaVetor(x0, this.EscalarVetor(`${resultadoLambda}`, d));
                 // Calculando o novo gradiente 
-                var newGrad = gradiente.map((item) => {return this.MinFuncao(item, xk1);});
-                // Calculando o novo g
-
-                // Verificando j
+                var newG = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item, xk1));});
+                x0 = xk1;
                 if( j == (n-1) ){
-
+                    break;
                 } else {
-
+                    var beta = this.Betak(g.map((item) => {return item.toString(); }), newG.map((item) => { return item.toString(); })); 
+                    var newD = this.SomaVetor(this.EscalarVetor('-1', newG), this.EscalarVetor(`${beta}`, d));
+                    d = newD;
                 }
             } // Fim do for 
             k++;            
@@ -539,9 +534,13 @@ export class MethodsService {
 
     /** Funções auxiliares de Fleetcher and Reeves */
     Betak(gk, gk1){
+        //console.log(gk, typeof gk, gk1, typeof gk1);
         var denominador = this.math.multiply(gk, this.VetorTranspostaParaNormal(gk)); 
+        //console.log(`denominador: ${denominador}`);
         var dividendo = this.math.multiply(gk1, this.VetorTranspostaParaNormal(gk1)); 
+        //console.log(`dividendo: ${dividendo}`); 
         var beta = denominador / dividendo;
+        //console.log(`Beta dentro da função: ${beta}`);
         return beta;        
     }
 
