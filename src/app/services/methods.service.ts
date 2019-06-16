@@ -224,7 +224,6 @@ export class MethodsService {
                     //console.log("hessiana["+j+","+i+"]:" + objIteracao.hessiana[j*n+i]);
                 }                      
                 objIteracao.grad[j] = this.math.eval(this.MinFuncao(objIteracao.grad[j].toString(),objIteracao.xk)); 
-                //console.log("gradiente:" + objIteracao.grad[j]);
             }  
 
             objIteracao.norm_grad =  this.NormaVetor(objIteracao.grad); 
