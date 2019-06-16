@@ -114,8 +114,31 @@ export class CalcComponent implements OnInit {
             };
 
             break;
-          case 4: 
-            // Newton 
+          case 4:           
+            // Newton
+            var aux4 = this.poMethods.Newton(this.nfEquation, this.nfx0, this.precision);
+            console.log(aux4);
+            // Formatando os dados para mostrar somente 4 casas decimais
+            var newArray4 = aux4.iteracoes.map((item) => {
+                var obj = {
+                    k: item.k, 
+                    xk: item.xk.map((f) => { return parseFloat(f).toFixed(4); }),
+                    fxk: item.fxk.toFixed(4), 
+                    grad: item.grad.map((f) => { return f.toFixed(4); }), 
+                    norm_grad: item.norm_grad.toFixed(4), 
+                    hessiana: item.hessiana.map((f) => { return parseFloat(f).toFixed(4); }), 
+                    hessiana_inversa: item.hessiana_inversa.map((f)=> { return parseFloat(f).toFixed(4);}),
+                    dk: item.dk.map((f) => { return f.toFixed(4); }),
+                    xk_1: item.xk_1.map((f) => { return parseFloat(f).toFixed(4); })                   
+                }; 
+                return obj;
+            });
+            
+            this.resultado[this.method-1] = {
+                iteracoes: newArray4, 
+                resultado: aux4.resultado
+            };
+
             break;
           case 5: 
             // Gradiente Conjugado Generalizado
