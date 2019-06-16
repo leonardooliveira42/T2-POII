@@ -275,12 +275,101 @@ export class MethodsService {
         return objResultado;        
     }
 
-    Newton () {
-
+    Newton (func: string, x0: Array<number>, pre: string) {
+        var initialX = x0.map((item) => {
+            return item.toString(); 
+        }); 
+        var resultado = this.CalculoNewton(func, initialX, pre,x0.length);  
+        //console.log(resultado.resultado); 
+        return resultado; 
     }
+    CalculoNewton(f,x,precisao,n){
+        var iteracoes = [];         
+        var newf = f.split('='); newf[0] = 'f(x) = '; 
+        var k = 1;  
+        var xk = x;         
+        //loop (!this.NormaVetorMenorPrecisao(grad,precisao)) 
+        while(k < 300){
+            var objIteracao = { 
+                k: k, //ok
+                xk: xk,  //ok
+                fxk: 0,  //ok
+                grad: [], //ok
+                norm_grad: 0,                               
+                hessiana: [n*n],
+                hessiana_inversa: [n*n],
+                dk: [], //ok
+                xk_1: [], //ok 
+            };
+            objIteracao.fxk = this.math.eval(this.MinFuncao(newf[1], objIteracao.xk));
+            //fazendo gradiente e hessiana
+            for(let j =0;j<n;j++){
+                objIteracao.grad[j] = this.math.derivative(newf[1],'x'+j);            
+                for(let i=0;i<n;i++){
+                    objIteracao.hessiana[j*n+i] = this.math.derivative(newf[1],'x'+j);
+                    objIteracao.hessiana[j*n+i] = this.math.derivative(objIteracao.hessiana[j*n+i],'x'+i);
+                    objIteracao.hessiana[j*n+i] = this.math.eval(this.MinFuncao(objIteracao.hessiana[j*n+i].toString(),objIteracao.xk));
+                    //console.log("hessiana["+j+","+i+"]:" + objIteracao.hessiana[j*n+i]);
+                }                      
+                objIteracao.grad[j] = this.math.eval(this.MinFuncao(objIteracao.grad[j].toString(),objIteracao.xk)); 
+            }  
 
+            objIteracao.norm_grad =  this.NormaVetor(objIteracao.grad); 
+            //console.log(objIteracao.norm_grad);
+            if(objIteracao.norm_grad <precisao){
+                xk= objIteracao.xk;
+                iteracoes.push(this.CopyAnything(objIteracao));
+                break;
+            }
+            objIteracao.hessiana = this.listToMatrix(objIteracao.hessiana, n); //deixando como matriz
+            objIteracao.hessiana_inversa = this.math.inv(objIteracao.hessiana); //fazendo a inversa da hessiana
+            //console.log(objIteracao.hessiana_inversa);
+            //console.log("teste1")
+            var hessiana_inversa = this.math.dotMultiply(-1,objIteracao.hessiana_inversa) //inversa*-1
+            //console.log("teste")
+            objIteracao.dk =this.math.multiply(hessiana_inversa, objIteracao.grad); //direcao = -1(inversa)*grad
+            //console.log(objIteracao.dk);
+            //novo x
+            objIteracao.xk_1 = this.SomaVetor(objIteracao.xk,objIteracao.dk);
+            //console.log(xk) 
+            if(this.NormaVetor(this.SubtraiVetor(objIteracao.xk,objIteracao.xk_1))< parseFloat(precisao)){
+                xk = objIteracao.xk_1;
+                iteracoes.push(this.CopyAnything(objIteracao));
+                break;
+            } 
+            //atualizando k,x e fxk
+            k++;           
+            xk = objIteracao.xk_1;        //novo xk 
+            //console.log(objIteracao);
+            iteracoes.push(this.CopyAnything(objIteracao));            
+        }
+        if(k == 300){
+            alert("Numero máximo de 300 iterações ultrapassados");
+        }
+        console.log(xk);
+        var objResultado = {
+            iteracoes: iteracoes, 
+            resultado: xk
+        };
+        //return objResultado;      
+        return objResultado;  
+    }
+    
     /** Métodos que usam Direções conjudadas  */
-
+    listToMatrix(list, elementsPerSubArray) {
+        var matrix = [], i, k;
+    
+        for (i = 0, k = -1; i < list.length; i++) {
+            if (i % elementsPerSubArray === 0) {
+                k++;
+                matrix[k] = [];
+            }
+    
+            matrix[k].push(list[i]);
+        }
+    
+        return matrix;
+    }
     GradienteConjugadoGeneralizado() {
 
     }
