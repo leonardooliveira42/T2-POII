@@ -50,7 +50,7 @@ export class CalcComponent implements OnInit {
       this.precision = this.obj.precisao;
       
       // Calcular o ponto minimo usando o método indicado
-      console.log(this.obj.qV);
+      //console.log(this.obj.qV);
       this.ExecuteMethod();
   }
 
@@ -178,6 +178,9 @@ export class CalcComponent implements OnInit {
             break;
           case 6: 
             //Fletcher and Reeves
+            var aux6 = this.poMethods.FletcherAndReeves(this.nfEquation, this.nfx0, this.precision, this.nfx0.length);
+            console.log(aux6); 
+            this.resultado[this.method-1] = aux6; 
             break;
           case 7: 
             // Davidon-fletcher-powell

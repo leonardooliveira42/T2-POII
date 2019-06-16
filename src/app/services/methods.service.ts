@@ -102,7 +102,7 @@ export class MethodsService {
     // Feito
     HookeAndJeeves(func: string, x0: Array<number>, pre: string) {
 
-        var initialX = x0.map((item) => {
+       var initialX = x0.map((item) => {
             return item.toString();
         });
 
@@ -361,37 +361,53 @@ export class MethodsService {
     /** Extensão para problemas não quadraticos  */
     FletcherAndReeves(f, x, precisao, n) {
         var initialX = x.map((item) => { return item.toString(); }); 
-        var resultado = this.CalculoFletcherAndReeves(f, initialX, precisao, x.length);
+        console.log(`Função: ${f}, x0: ${x}, precisao: ${precisao}, Quantidade de variaveis: ${n}`);
+        var resultado = this.CalculoFletcherAndReeves(f, initialX, precisao, n);
         console.log(resultado); 
-        return resultado; 
+        return resultado;
     }
 
     CalculoFletcherAndReeves(f, x0, pre, n){
         
         var iteracoes = [];
         var gradiente = [];
+        var k = 0;
         var newf = f.split('='); newf[0] = 'f(x) = ';  
         for(let i=0; i<n; i++){
-            gradiente[i] = this.math.derivative(f, 'x'+i); 
+            console.log('teste');
+            gradiente[i] = this.math.derivative(newf[1], 'x'+i); 
         }
-        var g = gradiente; 
+        var g = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item.toString(), x0));}); 
         var d = this.EscalarVetor('-1', g); 
-        console.log(`Gradiente: ${gradiente}, Direção: ${d}`);
-        while(!this.NormaVetorMenorPrecisao(gradiente, pre)){ //Passo  1
+        console.log(`Gradiente: ${gradiente}, G: ${g}, Direção: ${d}`);
+        while(!this.NormaVetorMenorPrecisao(gradiente, pre) && k < 30 && false){ //Passo  1
+            console.log(`>>> Iteração: ${k} <<< `);
             // Cria o objeto iteração 
             
             // Passo 2
-            var aux = this.SomaVetor(x0, this.EscalarVetor('x', d)); 
-            // Substitui os valores dos respectivos x0, x1, x2.. e como o lambda como x
-            var lambda = newf[0] + this.MinFuncao(newf[1], aux);
-            // Executa a minimização por newton monovariavel com o valor inicial = 0 e a precisao de 0.001
-            var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
-            // Novo x
-            var xk1 = this.SomaVetor(x0, this.EscalarVetor(`${resultadoLambda}`, d));
+            for(let j=0; j<n; j++){
+                var aux = this.SomaVetor(x0, this.EscalarVetor('x', d)); 
+                // Substitui os valores dos respectivos x0, x1, x2.. e como o lambda como x
+                var lambda = newf[0] + this.MinFuncao(newf[1], aux);
+                // Executa a minimização por newton monovariavel com o valor inicial = 0 e a precisao de 0.001
+                var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
+                // Novo x
+                var xk1 = this.SomaVetor(x0, this.EscalarVetor(`${resultadoLambda}`, d));
+                // Calculando o novo gradiente 
+                var newGrad = gradiente.map((item) => {return this.MinFuncao(item, xk1);});
+                // Calculando o novo g
 
+                // Verificando j
+                if( j == (n-1) ){
 
+                } else {
 
+                }
+            } // Fim do for 
+            k++;            
         }
+
+        console.log('saiu');
     }
 
     DavidonFletcherPowell(){
@@ -423,6 +439,23 @@ export class MethodsService {
         var resultado =  this.math.eval(`sqrt(${soma})`); 
         //console.log(resultado);        
         return resultado;
+    }
+
+    /** Funções auxiliares de Fleetcher and Reeves */
+    Betak(gk, gk1){
+        var denominador = this.math.multiply(gk, this.VetorTranspostaParaNormal(gk)); 
+        var dividendo = this.math.multiply(gk1, this.VetorTranspostaParaNormal(gk1)); 
+        var beta = denominador / dividendo;
+        return beta;        
+    }
+
+    VetorTranspostaParaNormal(array){
+        var new_array = []; 
+        for(let i = 0; i < array.length; i++){
+            new_array[i] = []; 
+            new_array[i][0] = array[i]; 
+        }
+        return new_array;
     }
 
     /*** FUNÇÕES AUXILIARES  */
