@@ -193,6 +193,6 @@ export class CalcComponent implements OnInit {
      this.initialX = ''; 
      this.nfEquation = ''; 
      this.nfx0 = null;
-     this.quantidadeDeVariaveis = 0;
+     this.quantidadeDeVariaveis = 0;  
   }
 }
