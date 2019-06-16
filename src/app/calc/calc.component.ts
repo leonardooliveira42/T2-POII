@@ -185,4 +185,14 @@ export class CalcComponent implements OnInit {
       }
 
   }
+
+  LimparResultados() {
+     this.obj = null; 
+     this.resultado = this.resultado.map((item) => { return null; });
+     this.equation = ''; 
+     this.initialX = ''; 
+     this.nfEquation = ''; 
+     this.nfx0 = null;
+     this.quantidadeDeVariaveis = 0;
+  }
 }

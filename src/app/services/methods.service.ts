@@ -222,14 +222,16 @@ export class MethodsService {
         }
          //fazendo norma
          var norm_grad = this.NormaVetor(grad);             
-         var dk = [];
+         
         //loop
         while(!this.NormaVetorMenorPrecisao(grad,precisao) && k < 300){
+            var dk = [];
+            var newGrad = grad.map((item) => { return item; });
             var objIteracao = { 
                 k: k, //ok
                 xk: xk,  //ok
                 fxk: null,  //ok
-                grad: grad, //ok
+                grad: newGrad, //ok
                 dk: null, //ok
                 lambda: null, //ok
                 xk_1: null, //ok
@@ -261,6 +263,7 @@ export class MethodsService {
                 grad[j] = this.math.derivative(newf[1],'x'+j);            
                 grad[j] = this.math.eval(this.MinFuncao(grad[j].toString(),xk));                
             }
+            newGrad = grad.map((item) => { return item; });;
             //fazendo norma
             norm_grad = this.NormaVetor(grad);             
 
