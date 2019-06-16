@@ -88,6 +88,37 @@ export class CalcComponent implements OnInit {
             break;
           case 2: 
             // Hooke and Jeeves
+            var numeroCasaDecimal = 3;
+            var aux2 = this.poMethods.HookeAndJeeves(this.nfEquation, this.nfx0, this.precision); // Parametros
+            var newArray2 = aux2.iteracoes.map((item) => {
+               var newObj = {
+                  k: item.k,
+                  xk: item.xk.map((f) => { return parseFloat(f).toFixed(numeroCasaDecimal); }), 
+                  fxk: item.fxk.toFixed(numeroCasaDecimal), 
+                  newD: item.newD.map((f) => { return parseFloat(f).toFixed(numeroCasaDecimal) }), 
+                  newLambda: item.newLambda.toFixed(numeroCasaDecimal), 
+                  newYPlusLambda: item.newYPlusLambda.map((f) => { return parseFloat(f).toFixed(numeroCasaDecimal); }),
+                  intern: item.intern.map((i) => {
+                      var outroObj = {
+                          j: i.j, 
+                          d: i.d.map((f) => { return f.toFixed(numeroCasaDecimal); }), 
+                          lambda: i.lambda.toFixed(numeroCasaDecimal), 
+                          yk: i.yk.map((f) => {
+                            return parseFloat(f).toFixed(numeroCasaDecimal);
+                          }), 
+                          yk1: i.yk1.map((f) => { return parseFloat(f).toFixed(numeroCasaDecimal) })
+                      };
+                      return outroObj;
+                  })
+               };
+               return newObj;
+            }); 
+            console.log(aux2);
+
+            this.resultado[this.method - 1] = {
+               iteracoes: newArray2, 
+               resultado: aux2.resultado
+            }; 
             break;
           case 3: 
             // Gradiente

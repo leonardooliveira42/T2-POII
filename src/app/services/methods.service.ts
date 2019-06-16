@@ -17,6 +17,7 @@ export class MethodsService {
   /** METODOS DE PROGRAMAÇÃO NÃO LINEAR: MULTIVARIAVEL IRRESTRITO
    *      A seguir estão os métodos sem o uso de derivadas
    */
+    // Feito
     CoordenadasCiclicas(func: string, x0: Array<number>, pre: string) {
 
       var initialX = x0.map((item) => {
@@ -24,8 +25,6 @@ export class MethodsService {
       }); 
 
       var resultado = this.CalculoCoordenadasCiclicas(0, func, initialX, x0.length, pre, this.GerarIdentidade(x0.length), 300); 
-
-      console.log(`Resultado das coordenadas ciclicas: ${resultado}`); 
 
       return resultado; 
     }
@@ -82,7 +81,6 @@ export class MethodsService {
             }
             objIteracao.intern = forIteracoes;
             iteracoes.push(this.CopyAnything(objIteracao));
-            console.log(iteracoes); 
             // Verificando o criterio de parada
             var sub = this.SubtraiVetor(y1, x0); 
             //console.log("subtração dos vetores" + sub); 
@@ -101,12 +99,102 @@ export class MethodsService {
         return objResultado;          // Retorna o resultado 
     }
 
-    HookeAndJeeves() {
+    HookeAndJeeves(func: string, x0: Array<number>, pre: string) {
 
+        var initialX = x0.map((item) => {
+            return item.toString();
+        });
+
+        var resultado = this.CalculoHookeAndJeeves(0, func, initialX, x0.length, pre, this.GerarIdentidade(x0.length), 300); 
+
+        return resultado;
+    }
+
+    CalculoHookeAndJeeves(k, f, x0, n, pre, d, kmax) {
+
+        var iteracoes = [];
+        var newf = f.split("="); newf[0] = 'f(x) = ';
+        var y1 = x0; 
+        var loop = true; 
+        while(loop && k < kmax) { // Loop principal 
+            console.log(`>>> Iteração: ${k} <<<`);
+            // Cria o objeto iteração 
+            var objInteracao = {
+                k: k, 
+                xk: x0, 
+                fxk: null, 
+                intern: null, 
+                newD: null, 
+                newLambda: null, 
+                newYPlusLambda: null
+            };
+            // Gera o valor da funçao e resolve
+            var fxk = this.math.eval(this.MinFuncao(newf[1], x0)); 
+            objInteracao.fxk = fxk;
+            console.log(`Valor da função: ${fxk}`);
+            var forIteracoes = [];
+            var aux; 
+            // Calculando com coordenadas ciclicas 
+            for(let j=0; j<n; j++){
+                // Crio um objeto iteração interna
+                var objIntFor = {
+                    j: j, 
+                    d: d[j], 
+                    yk: y1, 
+                    lambda: null, 
+                    yk1: null
+                };
+                // Atribuo os valores já obtidos para esse objeto 
+
+                // Executo os calculos 
+                aux = this.SomaVetor(y1, this.EscalarVetor('x', d[j]));
+                // Substitui os valores resp
+                var lambda = newf[0] + this.MinFuncao(newf[1], aux); 
+                // Executa a minimização por newton para calcular o valor de lambda
+                var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
+                objIntFor.lambda = resultadoLambda; 
+                // Atualiza o lambda no objeto da iteração 
+                y1 = this.SomaVetor(y1, this.EscalarVetor(`${resultadoLambda}`, d[j])); 
+                // Novo valor de y, atualiza no objeto 
+                objIntFor.yk1 = y1; 
+                // Pusha para o vetor de iterações interno o objeto atual 
+                forIteracoes.push(objIntFor); 
+            }
+            // Salva o vetor iteração no objeto maior
+            objInteracao.intern = forIteracoes; 
+            // Subtrai os valores de x 
+            var subtracaoDeVetores = this.SubtraiVetor(x0, y1); 
+            // Atualiza o x0
+            x0 = y1; 
+            // Atualiza iteração 
+            k++; 
+            // Entra no Passo 2
+            if(!this.NormaVetorMenorPrecisao(subtracaoDeVetores, pre)) {  // Se a norma for maior que a precisao, executa o passo 2
+                var newD = subtracaoDeVetores; 
+                objInteracao.newD = newD;
+                // Encontrando o novo y
+                aux = this.SomaVetor(y1, this.EscalarVetor('x', newD));  // mudar y1
+                // Substituindo os valores 
+                var lambdaAsterisco = newf[0] + this.MinFuncao(newf[1], aux); 
+                // Executa a minimização por newton 
+                var resultadoLambdaAsterisco = this.MonoNewton(0, lambdaAsterisco, 0.001); 
+                objInteracao.newLambda = resultadoLambdaAsterisco;
+                // Usa um novo y
+                y1 = this.SomaVetor(y1, this.EscalarVetor(`${resultadoLambdaAsterisco}`, newD));
+                objInteracao.newYPlusLambda = y1; 
+                iteracoes.push(objInteracao);
+            } else {
+                var objResultado = {
+                    iteracoes: iteracoes, 
+                    resultado: x0
+                };
+                return objResultado;
+            }
+        }
     }
 
     /** Métodos com o uso de derivadas */
-
+    // Feito
     Gradiente(func: string, x0: Array<number>, pre: string) {
 
         var initialX = x0.map((item) => {

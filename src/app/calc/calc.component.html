@@ -104,6 +104,66 @@
                   </table>
               </div>
 
+              <div class="resultados" *ngIf="resultado[method-1] != null && method == 2"> <!-- Hooke and Jeeves -->
+                <table class="table table-bordered text-center mt-5" style="vertical-align: middle;">
+                  <thead class="thead-dark">
+                     <th> k </th>
+                     <th> x<sub>k</sub> </th>
+                     <th> f(x<sub>k</sub>) </th>
+                     <th> j </th>
+                     <th> y<sub>j</sub></th>
+                     <th> d<sub>j</sub></th>  
+                     <th> &lambda;<sub>j</sub></th>
+                     <th> y<sub>j+1</sub></th>
+                     <th> d^ </th>
+                     <th> &lambda;^ </th>
+                     <th> y<sub>3</sub> + (&lambda;^)*d^ </th>
+                  </thead>
+                  <tbody>
+                    <ng-container *ngFor="let item of resultado[method-1].iteracoes" >
+                       <tr>
+                          <td [attr.rowspan]="obj.qV"> {{ item.k }} </td>
+                          <td [attr.rowspan]="obj.qV"> ( {{ item.xk }} ) </td>
+                          <td [attr.rowspan]="obj.qV">  {{ item.fxk }} </td>
+                          <td> {{ item.intern[0].j }} </td>
+                          <td> ( {{ item.intern[0].yk }} ) </td>
+                          <td> ( {{ item.intern[0].d }} ) </td>
+                          <td> {{ item.intern[0].lambda }} </td>
+                          <td> ( {{ item.intern[0].yk1 }} ) </td>
+                          <td> ( {{ item.newD }} ) </td>
+                          <td> ( {{ item.newLambda }} ) </td>
+                          <td> ( {{ item.newYPlusLambda }} ) </td>
+                       </tr>
+                       <ng-container *ngFor="let i of item.intern">
+                         <tr *ngIf="i.j != 0">
+                            <td> {{ i.j }} </td>
+                            <td> ( {{ i.yk }} ) </td>
+                            <td> ( {{ i.d }} ) </td>
+                            <td> {{ i.lambda }} </td>
+                            <td> ( {{ i.yk1 }} ) </td>
+                            <td> ( {{ item.newD }} ) </td>
+                            <td> ( {{ item.newLambda }} ) </td>
+                            <td> ( {{ item.newYPlusLambda }} ) </td>
+                         </tr>
+                       </ng-container>
+                    </ng-container>
+                  </tbody>
+                  <tfoot class="thead-dark">
+                    <th> k </th>
+                    <th> x<sub>k</sub> </th>
+                    <th> f(x<sub>k</sub>) </th>
+                    <th> j </th>
+                    <th> y<sub>j</sub></th>
+                    <th> d<sub>j</sub></th>  
+                    <th> &lambda;<sub>j</sub></th>
+                    <th> y<sub>j+1</sub></th>
+                    <th> d^ </th>
+                    <th> &lambda;^ </th>
+                    <th> y<sub>3</sub> + (&lambda;^)*d^ </th>
+                  </tfoot>
+               </table>
+              </div>
+
               <div class="resultados" *ngIf="resultado[method-1] != null  && method == 3"> <!-- Método do gradiente -->
                 <table class="table table-bordered text-center mt-5">
                   <thead class="thead-dark">
@@ -141,7 +201,7 @@
                     <th> x<sub>k+1</sub></th>
                   </tfoot>
                </table>
-           </div>
+              </div>
 
             </div>
             <div class="card-footer bg-success text-white">
