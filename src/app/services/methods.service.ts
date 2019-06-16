@@ -279,7 +279,7 @@ export class MethodsService {
         return objResultado;        
     }
 
-    
+    // Feito
     Newton (func: string, x0: Array<number>, pre: string) {
         var initialX = x0.map((item) => {
             return item.toString(); 
@@ -453,8 +453,39 @@ export class MethodsService {
     return objResultado;
     }
     /** Extensão para problemas não quadraticos  */
-    FletcherAndReeves() {
+    FletcherAndReeves(f, x, precisao, n) {
+        var initialX = x.map((item) => { return item.toString(); }); 
+        var resultado = this.CalculoFletcherAndReeves(f, initialX, precisao, x.length);
+        console.log(resultado); 
+        return resultado; 
+    }
 
+    CalculoFletcherAndReeves(f, x0, pre, n){
+        
+        var iteracoes = [];
+        var gradiente = [];
+        var newf = f.split('='); newf[0] = 'f(x) = ';  
+        for(let i=0; i<n; i++){
+            gradiente[i] = this.math.derivative(f, 'x'+i); 
+        }
+        var g = gradiente; 
+        var d = this.EscalarVetor('-1', g); 
+        console.log(`Gradiente: ${gradiente}, Direção: ${d}`);
+        while(!this.NormaVetorMenorPrecisao(gradiente, pre)){ //Passo  1
+            // Cria o objeto iteração 
+            
+            // Passo 2
+            var aux = this.SomaVetor(x0, this.EscalarVetor('x', d)); 
+            // Substitui os valores dos respectivos x0, x1, x2.. e como o lambda como x
+            var lambda = newf[0] + this.MinFuncao(newf[1], aux);
+            // Executa a minimização por newton monovariavel com o valor inicial = 0 e a precisao de 0.001
+            var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
+            // Novo x
+            var xk1 = this.SomaVetor(x0, this.EscalarVetor(`${resultadoLambda}`, d));
+
+
+
+        }
     }
 
     DavidonFletcherPowell(){
