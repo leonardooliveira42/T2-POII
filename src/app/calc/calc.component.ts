@@ -31,7 +31,6 @@ export class CalcComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       this.method = params.get("id");
     });
-    // console.log(this.poMethods.NormaVetor([3,4]));
   }
 
   show() {
@@ -55,7 +54,6 @@ export class CalcComponent implements OnInit {
         this.b = this.obj.b;
       }
       // Calcular o ponto minimo usando o método indicado
-      //console.log(this.obj.qV);
       this.ExecuteMethod();
   }
 
@@ -84,12 +82,10 @@ export class CalcComponent implements OnInit {
                }; 
                return newobj;
             });
-            console.log(newArray);
             this.resultado[this.method-1] = {
                 iteracoes: newArray, 
                 resultado: aux.resultado //this.poMethods.TransformToLatex("x* = " + JSON.stringify(aux.resultado))
             };
-            console.log(this.resultado[this.method-1]);
             break;
           case 2: 
             // Hooke and Jeeves
@@ -118,7 +114,6 @@ export class CalcComponent implements OnInit {
                };
                return newObj;
             }); 
-            console.log(aux2);
 
             this.resultado[this.method - 1] = {
                iteracoes: newArray2, 
@@ -128,7 +123,6 @@ export class CalcComponent implements OnInit {
           case 3: 
             // Gradiente
             var aux3 = this.poMethods.Gradiente(this.nfEquation, this.nfx0, this.precision);
-            console.log(aux3);
             // Formatando os dados para mostrar somente 4 casas decimais
             var newArray3 = aux3.iteracoes.map((item) => {
                 var obj = {
@@ -153,7 +147,6 @@ export class CalcComponent implements OnInit {
           case 4:           
             // Newton
             var aux4 = this.poMethods.Newton(this.nfEquation, this.nfx0, this.precision);
-            console.log(aux4);
             // Formatando os dados para mostrar somente x casas decimais
             var newArray4 = aux4.iteracoes.map((item) => {
                 var casasDecimais = 2;
@@ -175,13 +168,11 @@ export class CalcComponent implements OnInit {
                 iteracoes: newArray4, 
                 resultado: aux4.resultado
             };
-            console.log(this.resultado[this.method-1]);
 
             break;
           case 5: 
             // Gradiente Conjugado Generalizado 
             var aux5 = this.poMethods.GradienteConjugadoGeneralizado(this.nfEquation, this.nfx0, this.precision,this.q,this.b);
-            //console.log(aux5);
             var newArray5 = aux5.iteracoes.map((item) => {
               var casasDecimais = 2;
               var obj = {
@@ -204,12 +195,10 @@ export class CalcComponent implements OnInit {
               iteracoes: newArray5, 
               resultado: aux5.resultado
           };
-          console.log(this.resultado[this.method-1]);
             break;
           case 6: 
             //Fletcher and Reeves
             var aux6 = this.poMethods.FletcherAndReeves(this.nfEquation, this.nfx0, this.precision, this.nfx0.length);
-            //console.log(aux6); 
             this.resultado[this.method-1] = {
               iteracoes: aux6.iteracoes.map((item) => {
                   var casasDecimais = 3; 
@@ -236,7 +225,6 @@ export class CalcComponent implements OnInit {
               }), 
               resultado: aux6.resultado
             };
-            console.log(this.resultado[this.method-1]);
             break;
           case 7: 
             // Davidon-fletcher-powell
