@@ -450,6 +450,7 @@ export class MethodsService {
             d0 = objIteracao.dk_1;
             g0 = objIteracao.gk_1;
             iteracoes.push(this.CopyAnything(objIteracao));            
+            k++;
         }
         var objResultado = {
             iteracoes: iteracoes, 
@@ -717,21 +718,6 @@ export class MethodsService {
         //return objResultado;      
         return objResultado;  
 
-    }
-
-    listToMatrix(list, elementsPerSubArray) {
-        var matrix = [], i, k;
-    
-        for (i = 0, k = -1; i < list.length; i++) {
-            if (i % elementsPerSubArray === 0) {
-                k++;
-                matrix[k] = [];
-            }
-    
-            matrix[k].push(list[i]);
-        }
-    
-        return matrix;
     }
 
     /** CÁLCULOS MATEMÁTICOS */

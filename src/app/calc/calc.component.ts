@@ -230,9 +230,10 @@ export class CalcComponent implements OnInit {
             break;
           case 7: 
             // Davidon-fletcher-powell
-            var aux7 = this.poMethods.DavidonFletcherPowell(this.nfEquation, this.nfx0, this.precision, this.nfx0.length);
-            console.log(aux7); 
-            this.resultado[this.method-1] = aux7; 
+            //var aux7 = this.poMethods.DavidonFletcherPowell(this.nfEquation, this.nfx0, this.precision, this.nfx0.length);
+            //console.log(aux7); 
+            //this.resultado[this.method-1] = aux7; 
+            alert('Não conseguimos terminar a implementação deste método');
             break;
       }
 
