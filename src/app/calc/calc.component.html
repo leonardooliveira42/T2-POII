@@ -238,6 +238,7 @@
                   </tfoot>
                 </table>
               </div>
+
               <div class="resultados" *ngIf="resultado[method-1] != null  && method == 5"> <!-- Método do gradiente conjugado-->
                 <table class="table table-bordered text-center mt-5">
                   <thead class="thead-dark">
@@ -280,6 +281,62 @@
                </table>
               </div>
 
+              <div class="resultados" *ngIf="resultado[method-1] != null  && method == 6"> <!-- Método do Fleetcher and Reeves -->
+                <table class="table table-bordered text-center mt-5">
+                  <thead class="thead-dark">
+                      <th> k </th>
+                      <th> (x<sub>k</sub>)<sup><small>T</small></sup> <br> f(x<sub>k</sub>) </th>
+                      <th> j </th>
+                      <th> (y<sub>j</sub>)<sup><small>T</small></sup> <br> f(y<sub>j</sub>) </th>
+                      <th> (grad f(y<sub>j</sub>))<sup><small>T</small></sup> </th>
+                      <th> || grad f(y<sub>j</sub>) || </th>
+                      <th> &beta; </th>
+                      <th> (d<sub>j</sub>)<sup><small>T</small></sup></th>
+                      <th> &lambda;<sub>j</sub> </th>
+                      <th> (y<sub>j+1</sub>)<sup><small>T</small></sup> </th>
+                  </thead>
+                  <tbody>
+                    <ng-container *ngFor="let item of resultado[method-1].iteracoes">
+                        <tr> 
+                            <td [attr.rowspan]="obj.qV"> {{ item.k }} </td>
+                            <td [attr.rowspan]="obj.qV">  ({{ item.xk }}) <br> {{ item.fxk }}  </td>
+                            <td> {{ item.intern[0].j }} </td>
+                            <td> ({{ item.intern[0].y1 }}) <br> {{ item.intern[0].fy1 }} </td>
+                            <td> ( {{ item.intern[0].grady1 }} ) </td>
+                            <td> {{ item.intern[0].norm_grad }} </td>
+                            <td> {{ item.intern[0].beta }} </td>
+                            <td> ( {{ item.intern[0].dj }} ) </td>
+                            <td> {{ item.intern[0].lambda }} </td>
+                            <td> ( {{ item.intern[0].yk1 }} ) </td>
+                        </tr>
+                        <ng-container *ngFor="let linha of item.intern">
+                          <tr *ngIf="linha.j != 0"> 
+                              <td> {{ linha.j }} </td>
+                              <td> ({{ linha.y1 }}) <br> {{ linha.fy1 }} </td>
+                              <td> ( {{ linha.grady1 }} ) </td>
+                              <td> {{ linha.norm_grad }} </td>
+                              <td> {{ linha.beta }} </td>
+                              <td> ( {{ linha.dj }} ) </td>
+                              <td> {{ linha.lambda }} </td>
+                              <td> ( {{ linha.yk1 }} ) </td>
+                          </tr>
+                        </ng-container>
+                    </ng-container>
+                  </tbody>
+                  <tfoot class="thead-dark">
+                      <th> k </th>
+                      <th> (x<sub>k</sub>)<sup><small>T</small></sup> <br> f(x<sub>k</sub>) </th>
+                      <th> j </th>
+                      <th> (y<sub>j</sub>)<sup><small>T</small></sup> <br> f(y<sub>j</sub>) </th>
+                      <th> (grad f(y<sub>j</sub>))<sup><small>T</small></sup> </th>
+                      <th> || grad f(y<sub>j</sub>) || </th>
+                      <th> &beta; </th>
+                      <th> (d<sub>j</sub>)<sup><small>T</small></sup></th>
+                      <th> &lambda;<sub>j</sub> </th>
+                      <th> (y<sub>j+1</sub>)<sup><small>T</small></sup> </th>
+                  </tfoot>
+               </table>
+              </div>
             </div>
             <div class="card-footer bg-success text-white">
                 <h3> Resultado: </h3>

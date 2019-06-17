@@ -459,6 +459,8 @@ export class MethodsService {
     FletcherAndReeves(f, x, precisao, n) {
         var initialX = x.map((item) => { return item.toString(); }); 
         console.log(`Função: ${f}, x0: ${x}, precisao: ${precisao}, Quantidade de variaveis: ${n}`);
+
+        //console.log(this.Betak([0.1623, -0.0816], [1,2]));
         var resultado = this.CalculoFletcherAndReeves(f, initialX, precisao, n);
         console.log(resultado); 
         return resultado;
@@ -469,36 +471,75 @@ export class MethodsService {
         var iteracoes = [];
         var gradiente = [];
         var k = 0;
+        var j = 0;
         var newf = f.split('='); newf[0] = 'f(x) = ';  
         for(let i=0; i<n; i++){
             //console.log('teste');
             gradiente[i] = this.math.derivative(newf[1], 'x'+i).toString(); 
         }
+        //console.log(gradiente); 
         var g = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item, x0));}); 
+        //console.log('g: ' + g); 
         var d = this.EscalarVetor('-1', g); 
         console.log(`Gradiente: ${gradiente}, G: ${g}, Direção: ${d}`);
-        while(!this.NormaVetorMenorPrecisao(g, pre) && k < 30){ //Passo  1
+        while(!this.NormaVetorMenorPrecisao(gradiente
+            .map((der) => { return this.math.simplify(this.MinFuncao(der, x0)); }), pre) && k < 4){ //Passo  1
             console.log(`>>> Iteração: ${k} <<<`);
-            for(let j=0; j<n; j++){
-                var aux = this.SomaVetor(x0, this.EscalarVetor('x', d)); 
+            var objIteracao = {
+                k: k, 
+                xk: x0, 
+                fxk: null, 
+                intern: null
+            };
+            //  Calculando o valor da função 
+            objIteracao.fxk = this.math.eval(this.MinFuncao(newf[1], x0));
+            var iteracoesFor = [];
+            var x_aux = x0;
+            for(let j = 0; j < n; j++){
+                // Objeto interno 
+                var objIntFor = {
+                    j: j, 
+                    y1: x_aux, 
+                    fy1: this.math.eval(this.MinFuncao(newf[1], x_aux)), 
+                    grady1: null, 
+                    norm_grad: null, 
+                    beta: null,     
+                    dj: d,          //ok
+                    lambda: null, // ok
+                    yk1: null  //ok 
+                };
+                // Calculando lambda
+                var aux = this.SomaVetor(x_aux, this.EscalarVetor('x', d)); 
                 var lambda = newf[0] + this.MinFuncao(newf[1], aux);
-                var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
-                var xk1 = this.SomaVetor(x0, this.EscalarVetor(`${resultadoLambda}`, d));
-                // Calculando o novo gradiente 
-                var newG = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item, xk1));});
-                x0 = xk1;
-                if( j == (n-1) ){
-                    break;
+                var resultadoLambda = this.MonoNewton(0, lambda, 0.001); objIntFor.lambda = resultadoLambda; 
+                // Calculando a direção vezes o lambda
+                var direcaoVezesLambda = this.EscalarVetor(`${resultadoLambda}`, d);
+                // Calculando o novo x
+                var xk1 = this.SomaVetor(x_aux, direcaoVezesLambda);
+                xk1 = xk1.map((item) => { return this.math.eval(item); }); objIntFor.yk1 = xk1;
+                // Calculando o novo g
+                var g1 = gradiente.map((der) => { return this.math.simplify(this.MinFuncao(der, xk1)); }); objIntFor.grady1 = g1.map((g) => { return g.toString(); });
+                objIntFor.norm_grad = this.NormaVetor(g1); 
+                if( j < n-1 ){
+                    var beta = this.Betak(g.map((g) => { return g.toString(); }), g1.map((g) => { return g.toString(); })); 
+                    objIntFor.beta = beta;
+                    //console.log(`Beta: ${beta}`);
+                    var d1 = this.SomaVetor(this.EscalarVetor('-1',g1), this.EscalarVetor(`${beta}`,d)); 
+                    d = d1;
+                    x_aux = xk1;
                 } else {
-                    var beta = this.Betak(g.map((item) => {return item.toString(); }), newG.map((item) => { return item.toString(); })); 
-                    var newD = this.SomaVetor(this.EscalarVetor('-1', newG), this.EscalarVetor(`${beta}`, d));
-                    d = newD;
+                    x0 = xk1;
                 }
-            } // Fim do for 
+                iteracoesFor.push(objIntFor);
+            }
+            objIteracao.intern = iteracoesFor;
+            iteracoes.push(objIteracao);
             k++;            
         }
-
-        console.log('saiu');
+        return {
+            iteracoes: iteracoes, 
+            resultado: x0
+        }; 
     }
 
     DavidonFletcherPowell(){
@@ -515,7 +556,8 @@ export class MethodsService {
             var floatitem = parseFloat(item); 
             soma += (floatitem*floatitem); 
         });
-        var resultado =  this.math.eval(`sqrt(${soma})`);         
+        var resultado =  this.math.eval(`sqrt(${soma})`); 
+        console.log(resultado);        
         var criterioParada = (resultado < parseFloat(pre));
         //console.log(`${resultado} < ${pre}? ${criterioParada}`);  
         //console.log(`Criterio de parada atingido: ${criterioParada}`); 
@@ -535,9 +577,9 @@ export class MethodsService {
     /** Funções auxiliares de Fleetcher and Reeves */
     Betak(gk, gk1){
         //console.log(gk, typeof gk, gk1, typeof gk1);
-        var denominador = this.math.multiply(gk, this.VetorTranspostaParaNormal(gk)); 
+        var denominador = this.math.multiply(gk1, this.VetorTranspostaParaNormal(gk1)); 
         //console.log(`denominador: ${denominador}`);
-        var dividendo = this.math.multiply(gk1, this.VetorTranspostaParaNormal(gk1)); 
+        var dividendo = this.math.multiply(gk, this.VetorTranspostaParaNormal(gk)); 
         //console.log(`dividendo: ${dividendo}`); 
         var beta = denominador / dividendo;
         //console.log(`Beta dentro da função: ${beta}`);
