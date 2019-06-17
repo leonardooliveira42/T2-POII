@@ -417,8 +417,201 @@ export class MethodsService {
         console.log('saiu');
     }
 
-    DavidonFletcherPowell(){
+    DavidonFletcherPowell(f, x, precisao, n){
+        var initialX = x.map((item) => { return item.toString(); }); 
+        //console.log(`Função: ${f}, x0: ${x}, precisao: ${precisao}, Quantidade de variaveis: ${n}`);
+        var resultado = this.CalculoDFP(f, initialX, precisao, n);
+        console.log(resultado); 
+        return resultado;
+    }
+    CalculoDFP(f,x,pre,n){
+        var iteracoes = [];         
+        var newf = f.split('='); newf[0] = 'f(x) = '; 
+        var k = 0;
+        var i = 0;  
+        var xk = x; //x inicial
+        var sk = []; // primeira vez = identidade
+        var primeira_vez = true;
 
+
+        console.log(n);
+        while(k < 50){
+            console.log(k);
+            console.log(i);
+            var objIteracao = { 
+                k: k, //ok
+                i:i,
+                xk: [],
+                gk:[],
+                sk: [],
+                dk: [],
+                ak: [],
+                xk_1: [],
+                gk_1: [],
+                qk: [],
+                pk: [],
+                sk_1: []
+            };
+            objIteracao.k = k;
+            objIteracao.i = i;
+            objIteracao.xk = xk;
+            //gradiente
+            if(primeira_vez){ //sk = identidade
+                for(let z=0; z<n; z++){ // Melhorar mais ainda
+                    objIteracao.gk[z] = this.math.derivative(newf[1], 'x'+z); 
+                    objIteracao.gk[z] = this.math.eval(this.MinFuncao(objIteracao.gk[z].toString(), objIteracao.xk));
+                    objIteracao.sk[z] = [];
+                    for(let y=0;y<n;y++){
+                        if(y==z) objIteracao.sk[z][y]=1;
+                        else objIteracao.sk[z][y]=0;
+                    }
+                }
+                primeira_vez = false;
+            }else{
+                for(let z=0; z<n; z++){ // Melhorar mais ainda
+                    objIteracao.gk[z] = this.math.derivative(newf[1], 'x'+z); 
+                    objIteracao.gk[z] = this.math.eval(this.MinFuncao(objIteracao.gk[z].toString(), objIteracao.xk));
+                }
+                objIteracao.sk = sk; //voltar aqui dps
+            }
+            console.log("norma vetor:" +this.NormaVetor(objIteracao.gk))
+            if(this.NormaVetor(objIteracao.gk)<parseFloat(pre)){
+                xk = objIteracao.xk;
+                iteracoes.push(this.CopyAnything(objIteracao)); 
+                break;
+            }
+            console.log("xk:")
+            console.log(objIteracao.xk);
+            console.log("gradk:")
+            console.log(objIteracao.gk);
+            console.log("sk:")
+            console.log(objIteracao.sk);
+            
+            objIteracao.dk = this.math.multiply(this.math.dotMultiply(-1,objIteracao.sk),this.math.transpose(objIteracao.gk));
+            console.log(objIteracao.dk);
+            var aux = this.SomaVetor(objIteracao.xk, this.EscalarVetor('x', objIteracao.dk));
+            var lambda = newf[0] + this.MinFuncao(newf[1], aux);
+            objIteracao.ak = this.MonoNewton(0, lambda, 0.001);
+            console.log("ak: "+objIteracao.ak);
+            objIteracao.xk_1 = this.math.add(objIteracao.xk, this.math.multiply(objIteracao.ak, objIteracao.dk)); 
+            console.log("xk+1: "+objIteracao.xk_1);
+
+            if(k<n-1){
+                //gradiente k+1
+                for(let z=0; z<n; z++){ // Melhorar mais ainda
+                    objIteracao.gk_1[z] = this.math.derivative(newf[1], 'x'+z); 
+                    objIteracao.gk_1[z] = this.math.eval(this.MinFuncao(objIteracao.gk_1[z].toString(), objIteracao.xk_1));
+                }
+                console.log("gradk+1: "+objIteracao.gk_1);
+
+                objIteracao.qk = this.math.subtract(objIteracao.gk_1,objIteracao.gk);
+                console.log("qk: "+objIteracao.qk);
+
+                objIteracao.pk = this.math.dotMultiply(objIteracao.ak,objIteracao.dk);
+                console.log("pk: "+objIteracao.pk);
+
+                objIteracao.sk_1 =this.math.add(objIteracao.sk,
+                    this.math.subtract(
+                        this.math.dotDivide(
+                            this.math.multiply(
+                                objIteracao.pk,
+                                this.math.transpose(objIteracao.pk)),
+                            this.math.multiply(
+                                this.math.transpose(objIteracao.pk),
+                                objIteracao.qk)
+                        ),
+                        this.math.dotDivide(
+                            this.math.multiply(
+                                this.math.multiply(
+                                    this.math.multiply(
+                                        objIteracao.sk,
+                                        objIteracao.qk),
+                                    this.math.transpose(objIteracao.qk)
+                                ),
+                                objIteracao.sk
+                            ),
+                            this.math.multiply(
+                                this.math.multiply(
+                                    this.math.transpose(objIteracao.qk),
+                                    objIteracao.sk
+                                ),objIteracao.qk
+                            )
+                        )
+                    ));
+                objIteracao.sk_1 =this.listToMatrix(objIteracao.sk_1,n);
+
+                /*objIteracao.sk_1 = this.math.add(objIteracao.sk,
+                    this.math.divide(
+                        this.math.multiply(
+                            this.math.subtract(
+                                this.math.transpose(objIteracao.pk),
+                                this.math.multiply(
+                                    this.math.transpose(objIteracao.sk),
+                                    this.math.transpose(objIteracao.qk)
+                                )
+                            ),
+                                this.math.subtract(
+                                    this.VetorTranspostaParaNormal(objIteracao.pk),
+                                    this.math.multiply(
+                                        this.math.transpose(objIteracao.sk),
+                                        this.math.transpose(objIteracao.qk)
+                                    )
+                                )
+                            
+                        ),
+                        this.math.multiply(
+                            this.math.transpose(objIteracao.qk),
+                            this.math.subtract(
+                                this.math.transpose(objIteracao.pk),
+                                this.math.multiply(
+                                    this.math.transpose(objIteracao.sk),
+                                    this.math.transpose(objIteracao.qk)
+                                )
+                            )
+                        )
+                    ));    */
+                console.log(objIteracao.sk_1);                                        
+                sk = objIteracao.sk_1;
+                xk = objIteracao.xk_1;
+                k++;
+            }else{
+
+                xk = objIteracao.xk_1;
+                sk = objIteracao.sk_1;
+
+                i++;
+                //break;
+                k=0;
+            }      
+            iteracoes.push(this.CopyAnything(objIteracao));
+            if(i == 2)break;           
+        }
+        if(k == 300){
+            alert("Numero máximo de 300 iterações ultrapassados");
+        }
+        console.log(xk);
+        var objResultado = {
+            iteracoes: iteracoes, 
+            resultado: xk //.map((item) => { return this.math.simplify(item); })
+        };
+        //return objResultado;      
+        return objResultado;  
+
+    }
+
+    listToMatrix(list, elementsPerSubArray) {
+        var matrix = [], i, k;
+    
+        for (i = 0, k = -1; i < list.length; i++) {
+            if (i % elementsPerSubArray === 0) {
+                k++;
+                matrix[k] = [];
+            }
+    
+            matrix[k].push(list[i]);
+        }
+    
+        return matrix;
     }
 
     /** CÁLCULOS MATEMÁTICOS */
