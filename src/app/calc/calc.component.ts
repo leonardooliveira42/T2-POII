@@ -31,7 +31,6 @@ export class CalcComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       this.method = params.get("id");
     });
-    // console.log(this.poMethods.NormaVetor([3,4]));
   }
 
   show() {
@@ -55,7 +54,6 @@ export class CalcComponent implements OnInit {
         this.b = this.obj.b;
       }
       // Calcular o ponto minimo usando o método indicado
-      //console.log(this.obj.qV);
       this.ExecuteMethod();
   }
 
@@ -84,12 +82,10 @@ export class CalcComponent implements OnInit {
                }; 
                return newobj;
             });
-            console.log(newArray);
             this.resultado[this.method-1] = {
                 iteracoes: newArray, 
                 resultado: aux.resultado //this.poMethods.TransformToLatex("x* = " + JSON.stringify(aux.resultado))
             };
-            console.log(this.resultado[this.method-1]);
             break;
           case 2: 
             // Hooke and Jeeves
@@ -118,7 +114,6 @@ export class CalcComponent implements OnInit {
                };
                return newObj;
             }); 
-            console.log(aux2);
 
             this.resultado[this.method - 1] = {
                iteracoes: newArray2, 
@@ -128,7 +123,6 @@ export class CalcComponent implements OnInit {
           case 3: 
             // Gradiente
             var aux3 = this.poMethods.Gradiente(this.nfEquation, this.nfx0, this.precision);
-            console.log(aux3);
             // Formatando os dados para mostrar somente 4 casas decimais
             var newArray3 = aux3.iteracoes.map((item) => {
                 var obj = {
@@ -153,7 +147,6 @@ export class CalcComponent implements OnInit {
           case 4:           
             // Newton
             var aux4 = this.poMethods.Newton(this.nfEquation, this.nfx0, this.precision);
-            console.log(aux4);
             // Formatando os dados para mostrar somente x casas decimais
             var newArray4 = aux4.iteracoes.map((item) => {
                 var casasDecimais = 2;
@@ -175,13 +168,13 @@ export class CalcComponent implements OnInit {
                 iteracoes: newArray4, 
                 resultado: aux4.resultado
             };
-            console.log(this.resultado[this.method-1]);
 
             break;
           case 5: 
             // Gradiente Conjugado Generalizado 
-           /* var aux5 = this.poMethods.GradienteConjugadoGeneralizado(this.nfEquation, this.nfx0, this.precision,this.q,this.b);
-            //console.log(aux5);
+
+            var aux5 = this.poMethods.GradienteConjugadoGeneralizado(this.nfEquation, this.nfx0, this.precision,this.q,this.b);
+
             var newArray5 = aux5.iteracoes.map((item) => {
               var casasDecimais = 2;
               var obj = {
@@ -204,13 +197,36 @@ export class CalcComponent implements OnInit {
               iteracoes: newArray5, 
               resultado: aux5.resultado
           };
-          console.log(this.resultado[this.method-1]);*/
             break;
           case 6: 
             //Fletcher and Reeves
             var aux6 = this.poMethods.FletcherAndReeves(this.nfEquation, this.nfx0, this.precision, this.nfx0.length);
-            console.log(aux6); 
-            this.resultado[this.method-1] = aux6; 
+            this.resultado[this.method-1] = {
+              iteracoes: aux6.iteracoes.map((item) => {
+                  var casasDecimais = 3; 
+                  var objeto = {
+                      k: item.k, 
+                      xk: item.xk.map((x) => { return parseFloat(x).toFixed(casasDecimais)}),
+                      fxk: item.fxk.toFixed(casasDecimais), 
+                      intern: item.intern.map((i2) => {
+                          var obj2 = {
+                              j: i2.j, 
+                              y1: i2.y1.map((y) => { return parseFloat(y).toFixed(casasDecimais); }), 
+                              fy1: i2.fy1.toFixed(casasDecimais), 
+                              grady1: i2.grady1.map((g) => { return parseFloat(g).toFixed(casasDecimais); }), 
+                              norm_grad: i2.norm_grad.toFixed(casasDecimais), 
+                              beta: ( i2.beta != null) ? i2.beta.toFixed(casasDecimais+3) : '-', 
+                              dj: i2.dj.map((d) => { return parseFloat(d).toFixed(casasDecimais); }), 
+                              lambda: i2.lambda.toFixed(casasDecimais), 
+                              yk1: i2.yk1.map((y1) => { return y1.toFixed(casasDecimais); })
+                          };  
+                          return obj2;
+                      })
+                  };
+                  return objeto;
+              }), 
+              resultado: aux6.resultado
+            };
             break;
           case 7: 
             // Davidon-fletcher-powell

@@ -1,6 +1,29 @@
+/**
+ *      EXPLICAÇÃO GERAL 
+ *      Todos os métodos tem as funções com os nomes e as funções CalculoNomeDoMetodo () 
+ *      As funções com os nomes sempre chamam a função do Calculo,  pois antes é feito um tratamento de dados
+ *      para que os dados sejam usados corretamente durante a função. 
+ * 
+ *      A biblioteca utilizada para alguns calculos avançados de matemática é a math.js
+ *      que pode ser visto aqui: https://mathjs.org/docs/index.html
+ * 
+ *      Outra biblioteca usada foi o Katex: https://katex.org/, foi utilizada para deixar algumas strings, visualmente bonitas
+ * 
+ *      O link para o trabalho é esse: https://leonerd42.github.io/T2-POII/ 
+ * 
+ *      Dentro de cada calculo, são gerados um vetor iteracoes e alguns objetos (structs). 
+ *      Esses objetos armazenam os dados daquela iteração e quando aquela iteração termina, 
+ *      esse objeto é acrescentado no vetor de iterações. 
+ * 
+ *      Quando os calculos acabam e o resultado é encontrado, o vetor de iterações é lido e apresentado na tela. 
+ *      E o resultado é apresentado no final do card.  
+ * 
+ *      Pra utilizar a biblioteca math.js, foi feita muita multiplicação de string, já que os parametros para 
+ *      as funções dessa biblioteca são strings;
+ */
+
+
 import { Injectable } from '@angular/core';
-
-
 
 declare var require: any
 
@@ -13,8 +36,6 @@ export class MethodsService {
   parser = this.math.parser();
 
   constructor() {}
-
-  // TODO Verificar divisão por 0 e procurar por muitos erros
   
   /** METODOS DE PROGRAMAÇÃO NÃO LINEAR: MULTIVARIAVEL IRRESTRITO
    *      A seguir estão os métodos sem o uso de derivadas
@@ -49,7 +70,6 @@ export class MethodsService {
             objIteracao.xk = x0; 
             var forIteracoes = [];
             
-            //console.log(` >>> Iteração ${k} <<<`);
             var loop = true; 
             var y1 = x0; 
             var aux;
@@ -85,7 +105,6 @@ export class MethodsService {
             iteracoes.push(this.CopyAnything(objIteracao));
             // Verificando o criterio de parada
             var sub = this.SubtraiVetor(y1, x0); 
-            //console.log("subtração dos vetores" + sub); 
             if(!this.NormaVetorMenorPrecisao(sub, pre)) loop = true; // Se o critério de parada não foi atingido, continua o loop
             else loop = false;                                       // Se o criterio de parada foi atingido, então encerra o loop
             x0 = y1;        // Atualiza o valor de x0
@@ -120,7 +139,6 @@ export class MethodsService {
         var y1 = x0; 
         var loop = true; 
         while(loop && k < kmax) { // Loop principal 
-            console.log(`>>> Iteração: ${k} <<<`);
             // Cria o objeto iteração 
             var objInteracao = {
                 k: k, 
@@ -134,7 +152,6 @@ export class MethodsService {
             // Gera o valor da funçao e resolve
             var fxk = this.math.eval(this.MinFuncao(newf[1], x0)); 
             objInteracao.fxk = fxk;
-            console.log(`Valor da função: ${fxk}`);
             var forIteracoes = [];
             var aux; 
             // Calculando com coordenadas ciclicas 
@@ -287,7 +304,6 @@ export class MethodsService {
             return item.toString(); 
         }); 
         var resultado = this.CalculoNewton(func, initialX, pre,x0.length);  
-        console.log(resultado);
         return resultado; 
     }
 
@@ -325,7 +341,6 @@ export class MethodsService {
             objIteracao.norm_grad =  this.NormaVetor(objIteracao.grad); 
 
             if(objIteracao.norm_grad < precisao){
-                console.log('aqui');
                 xk = objIteracao.xk.map((item) => { return this.math.eval(item.toString()); });    
                 iteracoes.push(this.CopyAnything(objIteracao));
                 break;
@@ -347,7 +362,6 @@ export class MethodsService {
         if(k == 300){
             alert("Numero máximo de 300 iterações ultrapassados");
         }
-        console.log(xk);
         var objResultado = {
             iteracoes: iteracoes, 
             resultado: xk //.map((item) => { return this.math.simplify(item); })
@@ -356,16 +370,100 @@ export class MethodsService {
         return objResultado;  
     }
     /** Métodos que usam Direções conjudadas  */
-    GradienteConjugadoGeneralizado() {
+    // Feito 
+    GradienteConjugadoGeneralizado(func: string, x0: Array<number>, pre: string, q: Array<number>, b: Array<number> ) {
+
+        var initialX = x0.map((item) => {
+            return item.toString(); 
+        }); 
+        var Q = q.map((item) => {
+            return item.toString(); 
+        }); 
+        var B = b.map((item) => {
+            return item.toString(); 
+        }); 
+        var resultado = this.CalculoGradiente_conj(func, initialX, pre,x0.length,Q,B);   
+        return resultado; 
 
     }
-
+    CalculoGradiente_conj(f,x,precisao,n,q,b){ 
+        var iteracoes = [];         
+        var newf = f.split('='); newf[0] = 'f(x) = '; 
+        q = this.listToMatrix(q,n);
+        q = this.math.transpose(q);  //q é uma matriz
+        var k = 0;  
+        var xk = x;
+        var g0;
+        g0 = this.math.subtract(this.math.multiply(q,xk),b);
+        var d0 = this.math.multiply(-1,g0);
+        if(this.NormaVetor(g0)<precisao){
+            var objIteracao1 = { 
+                k: 0, //ok
+                xk:xk,  //ok
+                gk: g0, //ok   
+                dk: d0, //ok
+            };
+            iteracoes.push(this.CopyAnything(objIteracao1));
+            var objResultado1 = {
+                iteracoes: iteracoes, 
+                resultado: xk //.map((item) => { return this.math.simplify(item); })
+            };
+            return objResultado1;
+        }
+        while(k < 300){
+            var objIteracao = { 
+                k: k, //ok
+                xk:[],  //ok
+                gk: [], //ok
+                gk_1: [],         
+                dk: [], //ok
+                lambdak:[],
+                dk_1:[],
+                bk:[],
+                xk_1: [], //ok 
+            };
+            objIteracao.xk = xk;
+            objIteracao.dk = d0;
+            objIteracao.gk = g0;
+            objIteracao.lambdak = this.math.multiply(-1,
+                (this.math.divide(
+                this.math.multiply(this.math.transpose(objIteracao.gk),objIteracao.dk),
+                this.math.multiply(this.math.multiply(this.math.transpose(objIteracao.dk),q),objIteracao.dk)
+                    )));
+            objIteracao.xk_1 = this.math.add(objIteracao.xk ,this.math.multiply(objIteracao.lambdak,objIteracao.dk));
+            objIteracao.gk_1 =  this.math.subtract(this.math.multiply(q,objIteracao.xk_1),b);
+            
+            if(this.NormaVetor(objIteracao.gk_1)<precisao){
+                xk = objIteracao.xk_1;
+                iteracoes.push(this.CopyAnything(objIteracao)); 
+                break;
+            }
+            objIteracao.bk = this.math.divide(
+                this.math.multiply(this.math.multiply(this.math.transpose(objIteracao.gk_1),q),objIteracao.dk),
+                this.math.multiply(this.math.multiply(this.math.transpose(objIteracao.dk),q),objIteracao.dk)
+                    );
+            objIteracao.dk_1 = this.math.add(
+                this.math.multiply(-1,objIteracao.gk_1),
+                this.math.multiply(objIteracao.bk,objIteracao.dk)
+            );
+            xk = objIteracao.xk_1;
+            d0 = objIteracao.dk_1;
+            g0 = objIteracao.gk_1;
+            iteracoes.push(this.CopyAnything(objIteracao));            
+        }
+        var objResultado = {
+            iteracoes: iteracoes, 
+            resultado: xk //.map((item) => { return this.math.simplify(item); })
+        };
+        //return objResultado; 
+    return objResultado;
+    }
     /** Extensão para problemas não quadraticos  */
+    // Feitp
     FletcherAndReeves(f, x, precisao, n) {
         var initialX = x.map((item) => { return item.toString(); }); 
-        console.log(`Função: ${f}, x0: ${x}, precisao: ${precisao}, Quantidade de variaveis: ${n}`);
+
         var resultado = this.CalculoFletcherAndReeves(f, initialX, precisao, n);
-        console.log(resultado); 
         return resultado;
     }
 
@@ -374,47 +472,69 @@ export class MethodsService {
         var iteracoes = [];
         var gradiente = [];
         var k = 0;
+        var j = 0;
         var newf = f.split('='); newf[0] = 'f(x) = ';  
         for(let i=0; i<n; i++){
-            console.log('teste');
-            gradiente[i] = this.math.derivative(newf[1], 'x'+i); 
+            gradiente[i] = this.math.derivative(newf[1], 'x'+i).toString(); 
         }
-        var g = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item.toString(), x0));}); 
+        var g = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item, x0));}); 
         var d = this.EscalarVetor('-1', g); 
-        console.log(`Gradiente: ${gradiente}, G: ${g}, Direção: ${d}`);
-        while(!this.NormaVetorMenorPrecisao(gradiente, pre) && k < 30){ //Passo  1
-            console.log(`>>> Iteração: ${k} <<< `);
-            // Cria o objeto iteração 
-            
-            // Passo 2
-            for(let j=0; j<n; j++){
-                var aux = this.SomaVetor(x0, this.EscalarVetor('x', d)); 
-                // Substitui os valores dos respectivos x0, x1, x2.. e como o lambda como x
+        while(!this.NormaVetorMenorPrecisao(gradiente
+            .map((der) => { return this.math.simplify(this.MinFuncao(der, x0)); }), pre) && k < 4){ //Passo  1
+            var objIteracao = {
+                k: k, 
+                xk: x0, 
+                fxk: null, 
+                intern: null
+            };
+            //  Calculando o valor da função 
+            objIteracao.fxk = this.math.eval(this.MinFuncao(newf[1], x0));
+            var iteracoesFor = [];
+            var x_aux = x0;
+            for(let j = 0; j < n; j++){
+                // Objeto interno 
+                var objIntFor = {
+                    j: j, 
+                    y1: x_aux, 
+                    fy1: this.math.eval(this.MinFuncao(newf[1], x_aux)), 
+                    grady1: null, 
+                    norm_grad: null, 
+                    beta: null,     
+                    dj: d,          //ok
+                    lambda: null, // ok
+                    yk1: null  //ok 
+                };
+                // Calculando lambda
+                var aux = this.SomaVetor(x_aux, this.EscalarVetor('x', d)); 
                 var lambda = newf[0] + this.MinFuncao(newf[1], aux);
-                // Executa a minimização por newton monovariavel com o valor inicial = 0 e a precisao de 0.001
-                var resultadoLambda = this.MonoNewton(0, lambda, 0.001); 
-                // Novo x
-                var xk1 = this.SomaVetor(x0, this.EscalarVetor(`${resultadoLambda}`, d));
-                // Calculando o novo gradiente 
-                var newG = gradiente.map((item) => { return this.math.simplify(this.MinFuncao(item.toString(), xk1));});
-                console.log(`novo gradiente: ${newG}`);
+                var resultadoLambda = this.MonoNewton(0, lambda, 0.001); objIntFor.lambda = resultadoLambda; 
+                // Calculando a direção vezes o lambda
+                var direcaoVezesLambda = this.EscalarVetor(`${resultadoLambda}`, d);
+                // Calculando o novo x
+                var xk1 = this.SomaVetor(x_aux, direcaoVezesLambda);
+                xk1 = xk1.map((item) => { return this.math.eval(item); }); objIntFor.yk1 = xk1;
                 // Calculando o novo g
-
-                // Verificando j
-                if( j == (n-1) ){
-                    x0 = xk1;
+                var g1 = gradiente.map((der) => { return this.math.simplify(this.MinFuncao(der, xk1)); }); objIntFor.grady1 = g1.map((g) => { return g.toString(); });
+                objIntFor.norm_grad = this.NormaVetor(g1); 
+                if( j < n-1 ){
+                    var beta = this.Betak(g.map((g) => { return g.toString(); }), g1.map((g) => { return g.toString(); })); 
+                    objIntFor.beta = beta;
+                    var d1 = this.SomaVetor(this.EscalarVetor('-1',g1), this.EscalarVetor(`${beta}`,d)); 
+                    d = d1;
+                    x_aux = xk1;
                 } else {
-                    // Calcular o beta 
-                    var beta = this.Betak(g, newG);
-
-                    var novaD = this.SomaVetor(this.EscalarVetor('-1', newG), this.EscalarVetor(`${beta}`, d)); 
-                    d = novaD; 
+                    x0 = xk1;
                 }
-            } // Fim do for 
+                iteracoesFor.push(objIntFor);
+            }
+            objIteracao.intern = iteracoesFor;
+            iteracoes.push(objIteracao);
             k++;            
         }
-
-        console.log('saiu');
+        return {
+            iteracoes: iteracoes, 
+            resultado: x0
+        }; 
     }
 
     DavidonFletcherPowell(f, x, precisao, n){
@@ -624,10 +744,9 @@ export class MethodsService {
             var floatitem = parseFloat(item); 
             soma += (floatitem*floatitem); 
         });
-        var resultado =  this.math.eval(`sqrt(${soma})`);         
+        var resultado =  this.math.eval(`sqrt(${soma})`); 
         var criterioParada = (resultado < parseFloat(pre));
-        //console.log(`${resultado} < ${pre}? ${criterioParada}`);  
-        //console.log(`Criterio de parada atingido: ${criterioParada}`); 
+
         return criterioParada;
     }
     NormaVetor( vetor: Array<string>) {
@@ -637,14 +756,13 @@ export class MethodsService {
             soma += (floatitem*floatitem); 
         });
         var resultado =  this.math.eval(`sqrt(${soma})`); 
-        //console.log(resultado);        
         return resultado;
     }
 
     /** Funções auxiliares de Fleetcher and Reeves */
     Betak(gk, gk1){
-        var denominador = this.math.multiply(gk, this.VetorTranspostaParaNormal(gk)); 
-        var dividendo = this.math.multiply(gk1, this.VetorTranspostaParaNormal(gk1)); 
+        var denominador = this.math.multiply(gk1, this.VetorTranspostaParaNormal(gk1)); 
+        var dividendo = this.math.multiply(gk, this.VetorTranspostaParaNormal(gk)); 
         var beta = denominador / dividendo;
         return beta;        
     }
@@ -677,6 +795,20 @@ export class MethodsService {
         } catch(e) {
             return ['false'];
         }     
+    }
+    listToMatrix(list, elementsPerSubArray) {
+        var matrix = [], i, k;
+    
+        for (i = 0, k = -1; i < list.length; i++) {
+            if (i % elementsPerSubArray === 0) {
+                k++;
+                matrix[k] = [];
+            }
+    
+            matrix[k].push(list[i]);
+        }
+    
+        return matrix;
     }
 
     // Transforma uma string expressão em texto latex

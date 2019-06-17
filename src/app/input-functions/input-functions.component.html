@@ -68,6 +68,9 @@
             <div class="col-8">
                 <button class="btn btn-dark btn-block calc" (click)="SendObject()" 
                 [disabled]="function == ''" > Calcular </button>
+                <span *ngIf="method == 5"> O método foi feito utlizando a função do exemplo 10 na apostila. 
+                                           Digite 1 na função somente para liberar o botão de calcular. 
+                                           Digite os valores de x, Q, b para fazer o calculo  </span>
             </div>
           </div>
         </div>   
