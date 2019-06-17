@@ -172,7 +172,9 @@ export class CalcComponent implements OnInit {
             break;
           case 5: 
             // Gradiente Conjugado Generalizado 
+
             var aux5 = this.poMethods.GradienteConjugadoGeneralizado(this.nfEquation, this.nfx0, this.precision,this.q,this.b);
+
             var newArray5 = aux5.iteracoes.map((item) => {
               var casasDecimais = 2;
               var obj = {
@@ -228,6 +230,9 @@ export class CalcComponent implements OnInit {
             break;
           case 7: 
             // Davidon-fletcher-powell
+            var aux7 = this.poMethods.DavidonFletcherPowell(this.nfEquation, this.nfx0, this.precision, this.nfx0.length);
+            console.log(aux7); 
+            this.resultado[this.method-1] = aux7; 
             break;
       }
 
