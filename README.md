@@ -1,27 +1,76 @@
-# T2POII
+# Segundo Trabalho de Pesquisa Operacional II
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.8.
+<div align="center">
+  <img style="width: 60%" src="./src/assets/t2-poii.png" alt="Exemplo imagem">
+</div>
 
-## Development server
+<br />
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+<div align="center" >
 
-## Code scaffolding
+[![Angular](https://img.shields.io/badge/Angular-v7.2.0-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v3.2.2-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-v4.1.1-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com/)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+</div>
 
-## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+## Sobre o projeto 
 
-## Running unit tests
+Este é o segundo trabalho desenvolvido na matéria de Pesquisa Operacional II
+do 5º termo do curso de Bacharel em Ciência da Computação (BCC) da
+UNESP "Julio de Mesquita Filho" do campus de Bauru, ministrada pela
+professora Dra. Marcia A. Zanoli Meira e Silva.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+O objetivo do projeto é disponibilizar alguns métodos de Programação não Linear para Otimização Multivariável Irrestrita. 
 
-## Running end-to-end tests
+## Métodos de otimização 
+Segue a lista de métodos de Programação Não Linear de Multivariáveis Irrestritas disponibilzados nesse projeto:
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+- Coordenadas Cíclicas;
+- Hooke and Jeeves;
+- Gradiente;
+- Newton;
+- Gradiente Conjugado Generalizado;
+- Fletcher and Reeves;
 
-## Further help
+### Exemplo de otimização 
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+<div align="center">
+  <img style="width: 60%" src="./src/assets/t2-poii-function.png" alt="Exemplo imagem">
+</div>
+
+<br />
+
+- Quantidade de variaveis: 2
+- Valor Inicial do X: 0, 3
+- Precisão: 0,1 
+- Função: (x0 - 2)^4 + (x0 - 2x1)^2 
+
+<div align="center">
+  <img style="width: 60%" src="./src/assets/t2-poii-function-2.png" alt="Exemplo imagem">
+</div>
+
+
+## 💻 Pré-requisitos
+
+Pra rodar o projeto na máquina é possível utilizar: 
+
+- Versão do node: `10.24.1`
+
+## Rodar na máquina 
+
+```
+git clone https://github.com/leonardooliveira42/T2-POII
+cd T2-POII 
+```
+
+Para instalar as dependencias
+```
+npm install 
+```
+
+Pra rodar localmente
+```
+npm run start
+```
